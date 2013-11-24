@@ -14,12 +14,13 @@ package drop
 	import drop.system.FlySystem;
 	import drop.system.LineBlastDetonationSystem;
 	import drop.system.LineBlastPulseSystem;
-	import drop.system.MoveSystem;
 	import drop.system.MatchingSystem;
+	import drop.system.MoveSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
 	import drop.system.SubmittingStateEndingSystem;
+	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 
 	import flash.geom.Point;
@@ -72,25 +73,25 @@ package drop
 			var engineStateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var selectingState : EngineState = engineStateMachine.createState("selecting");
-			selectingState.addInstance(new TouchInputSystem(quad, gameState)).withPriority(1);
-			selectingState.addInstance(new SelectControlSystem(gameState, boardSize, tileSize)).withPriority(2);
-			selectingState.addInstance(new SelectingStateEndingSystem(engineStateMachine, gameState)).withPriority(10);
+			selectingState.addInstance(new TouchInputSystem(quad, gameState)).withPriority(SystemPriorities.INPUT);
+			selectingState.addInstance(new SelectControlSystem(gameState, boardSize, tileSize)).withPriority(SystemPriorities.CONTROL);
+			selectingState.addInstance(new SelectingStateEndingSystem(engineStateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var submittingState : EngineState = engineStateMachine.createState("submitting");
-			submittingState.addInstance(new MatchingSystem()).withPriority(1);
+			submittingState.addInstance(new MatchingSystem()).withPriority(SystemPriorities.POST_LOGIC);
 			submittingState.addInstance(new SubmittingStateEndingSystem(engineStateMachine)).withPriority(10);
 
 			var cascadingState : EngineState = engineStateMachine.createState("cascading");
-			cascadingState.addInstance(new LineBlastDetonationSystem(creator)).withPriority(1);
-			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(2);
-			cascadingState.addInstance(new SpawnerSystem(tileSize, creator)).withPriority(3);
-			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(4);
-			cascadingState.addInstance(new CascadingStateEndingSystem(engineStateMachine)).withPriority(10);
+			cascadingState.addInstance(new LineBlastDetonationSystem(creator)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new SpawnerSystem(tileSize, creator)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new CascadingStateEndingSystem(engineStateMachine)).withPriority(SystemPriorities.END);
 
-			engine.addSystem(new FlySystem(), 1);
-			engine.addSystem(new BoundsSystem(), 2);
-			engine.addSystem(new CountdownSystem(), 3);
-			engine.addSystem(new DisplaySystem(boardContainer), 10);
+			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
+			engine.addSystem(new BoundsSystem(), SystemPriorities.LOGIC);
+			engine.addSystem(new CountdownSystem(), SystemPriorities.LOGIC);
+			engine.addSystem(new DisplaySystem(boardContainer), SystemPriorities.DISPLAY);
 
 			engineStateMachine.changeState("selecting");
 
