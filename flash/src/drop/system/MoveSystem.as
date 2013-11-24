@@ -72,21 +72,23 @@ package drop.system
 
 		private function sortMoveNodeList() : void
 		{
-			moveNodeList.mergeSort(function(moveNode1 : MoveNode, moveNode2 : MoveNode) : int
+			moveNodeList.mergeSort(compareMoveNodes);
+		}
+
+		private function compareMoveNodes(moveNode1 : MoveNode, moveNode2 : MoveNode) : int
+		{
+			if (moveNode1.transformComponent.y > moveNode2.transformComponent.y)
 			{
-				if (moveNode1.transformComponent.y > moveNode2.transformComponent.y)
-				{
-					return -1;
-				}
-				else if (moveNode1.transformComponent.y < moveNode2.transformComponent.y)
-				{
-					return 1;
-				}
-				else
-				{
-					return Math.random() < 0.5 ? 1 : -1;
-				}
-			});
+				return -1;
+			}
+			else if (moveNode1.transformComponent.y < moveNode2.transformComponent.y)
+			{
+				return 1;
+			}
+			else
+			{
+				return Math.random() < 0.5 ? 1 : -1;
+			}
 		}
 
 		private function isMoving(moveNode : MoveNode) : Boolean
