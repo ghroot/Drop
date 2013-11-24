@@ -4,21 +4,21 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
-	import drop.Creator;
+	import drop.EntityManager;
 	import drop.node.LineBlastNode;
 
 	import flash.geom.Point;
 
 	public class LineBlastDetonationSystem extends System
 	{
-		private var creator : Creator;
+		private var entityManager : EntityManager;
 
 		private var engine : Engine;
 		private var lineBlastNodeList : NodeList;
 
-		public function LineBlastDetonationSystem(creator : Creator)
+		public function LineBlastDetonationSystem(entityManager : EntityManager)
 		{
-			this.creator = creator;
+			this.entityManager = entityManager;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -38,7 +38,7 @@ package drop.system
 
 					for each (var blastDirection : Point in [new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1)])
 					{
-						engine.addEntity(creator.createLineBlastPulse(lineBlastNode.transformComponent.x, lineBlastNode.transformComponent.y, blastDirection.x, blastDirection.y));
+						engine.addEntity(entityManager.createLineBlastPulse(lineBlastNode.transformComponent.x, lineBlastNode.transformComponent.y, blastDirection.x, blastDirection.y));
 					}
 				}
 			}

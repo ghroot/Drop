@@ -2,7 +2,7 @@ package drop.system
 {
 	import ash.core.*;
 
-	import drop.Creator;
+	import drop.EntityManager;
 	import drop.component.MoveComponent;
 	import drop.node.BlockNode;
 	import drop.node.SpawnerNode;
@@ -10,16 +10,16 @@ package drop.system
 	public class SpawnerSystem extends System
 	{
 		private var tileSize : int;
-		private var creator : Creator;
+		private var entityManager : EntityManager;
 
 		private var engine : Engine;
 		private var spawnerNodeList : NodeList;
 		private var blockNodeList : NodeList;
 
-		public function SpawnerSystem(tileSize : int, creator : Creator)
+		public function SpawnerSystem(tileSize : int, entityManager : EntityManager)
 		{
 			this.tileSize = tileSize;
-			this.creator = creator;
+			this.entityManager = entityManager;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -38,11 +38,11 @@ package drop.system
 					var entity : Entity;
 					if (Math.random() <= 0.1)
 					{
-						entity = creator.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
+						entity = entityManager.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
 					}
 					else
 					{
-						entity = creator.createTile(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
+						entity = entityManager.createTile(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
 					}
 					engine.addEntity(entity);
 

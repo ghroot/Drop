@@ -4,21 +4,22 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
+	import drop.EntityManager;
+
 	import drop.node.BoundsNode;
 
 	public class BoundsSystem extends System
 	{
-		private var engine : Engine;
+		private var entityManager : EntityManager;
 		private var boundsNodeList : NodeList;
 
-		public function BoundsSystem()
+		public function BoundsSystem(entityManager : EntityManager)
 		{
+			this.entityManager = entityManager;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			this.engine = engine;
-
 			boundsNodeList = engine.getNodeList(BoundsNode);
 		}
 
@@ -28,7 +29,7 @@ package drop.system
 			{
 				if (isOutsideOfBounds(boundsNode))
 				{
-					engine.removeEntity(boundsNode.entity);
+					entityManager.destroyEntity(boundsNode.entity);
 				}
 			}
 		}

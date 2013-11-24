@@ -1,5 +1,6 @@
 package drop
 {
+	import ash.core.Engine;
 	import ash.core.Entity;
 	import ash.fsm.EntityState;
 	import ash.fsm.EntityStateMachine;
@@ -22,13 +23,15 @@ package drop
 
 	import starling.display.Quad;
 
-	public class Creator
+	public class EntityManager
 	{
+		private var engine : Engine;
 		private var boardSize : Point;
 		private var tileSize : int;
 
-		public function Creator(boardSize : Point, tileSize : int)
+		public function EntityManager(engine : Engine, boardSize : Point, tileSize : int)
 		{
+			this.engine = engine;
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
 		}
@@ -178,6 +181,11 @@ package drop
 			entity.add(new TransformComponent(x, y));
 
 			return entity;
+		}
+
+		public function destroyEntity(entity : Entity) : void
+		{
+			engine.removeEntity(entity);
 		}
 	}
 }

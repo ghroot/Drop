@@ -2,22 +2,22 @@ package drop.system
 {
 	import ash.core.*;
 
+	import drop.EntityManager;
 	import drop.data.Countdown;
-
 	import drop.node.CountdownNode;
 
 	public class CountdownSystem extends System
 	{
-		private var engine : Engine;
+		private var entityManager : EntityManager;
 		private var countdownNodeList : NodeList;
 
-		public function CountdownSystem()
+		public function CountdownSystem(entityManager : EntityManager)
 		{
+			this.entityManager = entityManager;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			this.engine = engine;
 			countdownNodeList = engine.getNodeList(CountdownNode);
 			countdownNodeList.nodeAdded.add(onNodeAdded);
 
@@ -61,7 +61,7 @@ package drop.system
 					}
 					else
 					{
-						engine.removeEntity(countdownNode.entity);
+						entityManager.destroyEntity(countdownNode.entity);
 					}
 				}
 			}

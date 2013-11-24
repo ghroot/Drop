@@ -46,7 +46,7 @@ package drop
 
 			var engine : Engine = new Engine();
 
-			var creator : Creator = new Creator(boardSize, tileSize);
+			var entityManager : EntityManager = new EntityManager(engine, boardSize, tileSize);
 
 			for (var row : int = 0; row < boardSize.y; row++)
 			{
@@ -56,16 +56,16 @@ package drop
 					var y : Number = row * tileSize;
 					if (row == 0)
 					{
-						engine.addEntity(creator.createSpawner(x, y));
+						engine.addEntity(entityManager.createSpawner(x, y));
 					}
 					if ((row == 2 || row == 5) &&
 							(column == 1 || column == 5))
 					{
-						engine.addEntity(creator.createBlocker(x, y));
+						engine.addEntity(entityManager.createBlocker(x, y));
 					}
 					else
 					{
-						engine.addEntity(creator.createTile(x, y));
+						engine.addEntity(entityManager.createTile(x, y));
 					}
 				}
 			}
@@ -82,15 +82,15 @@ package drop
 			submittingState.addInstance(new SubmittingStateEndingSystem(engineStateMachine)).withPriority(10);
 
 			var cascadingState : EngineState = engineStateMachine.createState("cascading");
-			cascadingState.addInstance(new LineBlastDetonationSystem(creator)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new SpawnerSystem(tileSize, creator)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new SpawnerSystem(tileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new CascadingStateEndingSystem(engineStateMachine)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new BoundsSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new CountdownSystem(), SystemPriorities.LOGIC);
+			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
+			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new DisplaySystem(boardContainer), SystemPriorities.DISPLAY);
 
 			engineStateMachine.changeState("selecting");
