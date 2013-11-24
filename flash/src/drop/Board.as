@@ -7,10 +7,15 @@ package drop
 	import ash.tick.ITickProvider;
 
 	import drop.data.GameState;
+	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
+	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
+	import drop.system.FlySystem;
+	import drop.system.LineBlastDetonationSystem;
+	import drop.system.LineBlastPulseSystem;
 	import drop.system.MoveSystem;
-	import drop.system.RemoveSelectionSystem;
+	import drop.system.MatchingSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
@@ -40,7 +45,7 @@ package drop
 
 			var engine : Engine = new Engine();
 
-			var creator : Creator = new Creator(tileSize);
+			var creator : Creator = new Creator(boardSize, tileSize);
 
 			for (var row : int = 0; row < boardSize.y; row++)
 			{
@@ -52,7 +57,7 @@ package drop
 					{
 						engine.addEntity(creator.createSpawner(x, y));
 					}
-					if (row == 3 &&
+					if ((row == 2 || row == 5) &&
 							(column == 1 || column == 5))
 					{
 						engine.addEntity(creator.createBlocker(x, y));
@@ -72,14 +77,19 @@ package drop
 			selectingState.addInstance(new SelectingStateEndingSystem(engineStateMachine, gameState)).withPriority(10);
 
 			var submittingState : EngineState = engineStateMachine.createState("submitting");
-			submittingState.addInstance(new RemoveSelectionSystem()).withPriority(1);
+			submittingState.addInstance(new MatchingSystem()).withPriority(1);
 			submittingState.addInstance(new SubmittingStateEndingSystem(engineStateMachine)).withPriority(10);
 
 			var cascadingState : EngineState = engineStateMachine.createState("cascading");
-			cascadingState.addInstance(new SpawnerSystem(tileSize, creator)).withPriority(1);
-			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(2);
+			cascadingState.addInstance(new LineBlastDetonationSystem(creator)).withPriority(1);
+			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(2);
+			cascadingState.addInstance(new SpawnerSystem(tileSize, creator)).withPriority(3);
+			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(4);
 			cascadingState.addInstance(new CascadingStateEndingSystem(engineStateMachine)).withPriority(10);
 
+			engine.addSystem(new FlySystem(), 1);
+			engine.addSystem(new BoundsSystem(), 2);
+			engine.addSystem(new CountdownSystem(), 3);
 			engine.addSystem(new DisplaySystem(boardContainer), 10);
 
 			engineStateMachine.changeState("selecting");

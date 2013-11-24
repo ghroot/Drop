@@ -35,7 +35,15 @@ package drop.system
 			{
 				if (canEntityBeCreatedAt(spawnerNode))
 				{
-					var entity : Entity = creator.createTile(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
+					var entity : Entity;
+					if (Math.random() <= 0.1)
+					{
+						entity = creator.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
+					}
+					else
+					{
+						entity = creator.createTile(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
+					}
 					engine.addEntity(entity);
 
 					var moveComponent : MoveComponent = entity.get(MoveComponent);
