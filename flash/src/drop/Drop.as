@@ -5,7 +5,7 @@ package drop
 
 	import starling.core.Starling;
 
-	[SWF(frameRate="100", width="640", height="960")]
+	[SWF(frameRate="60", width="640", height="960")]
 	public class Drop extends Sprite
 	{
 		public function Drop()
