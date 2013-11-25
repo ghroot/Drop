@@ -2,7 +2,7 @@ package drop.system
 {
 	import ash.core.*;
 
-	import drop.EntityManager;
+	import drop.board.EntityManager;
 	import drop.component.MoveComponent;
 	import drop.node.BlockNode;
 	import drop.node.SpawnerNode;

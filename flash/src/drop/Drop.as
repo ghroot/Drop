@@ -1,5 +1,7 @@
 package drop
 {
+	import drop.board.Board;
+
 	import flash.display.Sprite;
 	import flash.events.Event;
 

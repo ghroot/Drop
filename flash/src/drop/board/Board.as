@@ -1,5 +1,6 @@
-package drop
+package drop.board
 {
+	import drop.*;
 	import ash.core.Engine;
 	import ash.fsm.EngineState;
 	import ash.fsm.EngineStateMachine;

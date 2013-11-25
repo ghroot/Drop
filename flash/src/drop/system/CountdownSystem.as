@@ -2,7 +2,7 @@ package drop.system
 {
 	import ash.core.*;
 
-	import drop.EntityManager;
+	import drop.board.EntityManager;
 	import drop.data.Countdown;
 	import drop.node.CountdownNode;
 

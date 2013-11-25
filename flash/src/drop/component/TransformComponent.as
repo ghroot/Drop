@@ -1,14 +1,35 @@
 package drop.component
 {
+	import ash.tools.ComponentPool;
+
 	public class TransformComponent
 	{
 		public var x : Number;
 		public var y : Number;
 
-		public function TransformComponent(x : Number = 0, y : Number = 0)
+		public static function create() : TransformComponent
 		{
-			this.x = x;
-			this.y = y;
+			var component : TransformComponent = ComponentPool.get(TransformComponent);
+			component.reset();
+			return component;
+		}
+
+		public function reset() : void
+		{
+			x = 0;
+			y = 0;
+		}
+
+		public function withX(value : Number) : TransformComponent
+		{
+			x = value;
+			return this;
+		}
+
+		public function withY(value : Number) : TransformComponent
+		{
+			y = value;
+			return this;
 		}
 	}
 }

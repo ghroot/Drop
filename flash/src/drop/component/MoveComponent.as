@@ -1,5 +1,7 @@
 package drop.component
 {
+	import ash.tools.ComponentPool;
+
 	public class MoveComponent
 	{
 		public static const FALL_ACCELERATION : int = 160;
@@ -20,7 +22,14 @@ package drop.component
 		public var movingTowardsY : Number;
 		public var slidingTowardsPositionX : Number;
 
-		public function MoveComponent()
+		public static function create() : MoveComponent
+		{
+			var component : MoveComponent = ComponentPool.get(MoveComponent);
+			component.reset();
+			return component;
+		}
+
+		public function reset() : void
 		{
 			velocityX = 0;
 			velocityY = 0;

@@ -1,12 +1,27 @@
 package drop.component
 {
+	import ash.tools.ComponentPool;
+
 	public class LineBlastComponent
 	{
 		public var isTriggered : Boolean;
 
-		public function LineBlastComponent(isTriggered : Boolean = false)
+		public static function create() : LineBlastComponent
 		{
-			this.isTriggered = isTriggered;
+			var component : LineBlastComponent = ComponentPool.get(LineBlastComponent);
+			component.reset();
+			return component;
+		}
+
+		public function reset() : void
+		{
+			isTriggered = false;
+		}
+
+		public function withIsTriggered(value : Boolean) : LineBlastComponent
+		{
+			isTriggered = value;
+			return this;
 		}
 	}
 }

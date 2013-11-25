@@ -4,7 +4,7 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
-	import drop.EntityManager;
+	import drop.board.EntityManager;
 
 	import drop.node.BoundsNode;
 

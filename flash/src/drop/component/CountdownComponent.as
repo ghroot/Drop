@@ -1,5 +1,7 @@
 package drop.component
 {
+	import ash.tools.ComponentPool;
+
 	import drop.data.Countdown;
 
 	public class CountdownComponent
@@ -9,10 +11,30 @@ package drop.component
 
 		public var countdown : Countdown;
 
-		public function CountdownComponent(time : Number = 0, stateToChangeTo : String = null)
+		public static function create() : CountdownComponent
 		{
-			this.time = time;
-			this.stateToChangeTo = stateToChangeTo;
+			var component : CountdownComponent = ComponentPool.get(CountdownComponent);
+			component.reset();
+			return component;
+		}
+
+		public function reset() : void
+		{
+			time = 0;
+			stateToChangeTo = null;
+			countdown = null;
+		}
+
+		public function withTime(value : Number) : CountdownComponent
+		{
+			time = value;
+			return this;
+		}
+
+		public function withStateToChangeTo(value : String) : CountdownComponent
+		{
+			stateToChangeTo = value;
+			return this;
 		}
 	}
 }
