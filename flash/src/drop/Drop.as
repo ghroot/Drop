@@ -4,12 +4,17 @@ package drop
 
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.geom.Rectangle;
 
 	import starling.core.Starling;
+	import starling.utils.HAlign;
+	import starling.utils.VAlign;
 
-	[SWF(frameRate="60", width="640", height="960")]
+	[SWF(backgroundColor="0xffffff", frameRate="60")]
 	public class Drop extends Sprite
 	{
+		private var starling : Starling;
+
 		public function Drop()
 		{
 			if (stage != null)
@@ -33,9 +38,21 @@ package drop
 		{
 			Starling.handleLostContext = true;
 
-			var starling : Starling = new Starling(Board, stage);
-//			starling.showStats = true;
+			stage.addEventListener(Event.RESIZE, onResize);
+
+			starling = new Starling(Board, stage);
+			starling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
 			starling.start();
+		}
+
+		private function onResize(event : Event) : void
+		{
+			starling.stage.stageWidth = stage.stageWidth;
+			starling.stage.stageHeight = stage.stageHeight;
+			const viewPort : Rectangle = starling.viewPort;
+			viewPort.width = stage.stageWidth;
+			viewPort.height = stage.stageHeight;
+			starling.viewPort = viewPort;
 		}
 	}
 }

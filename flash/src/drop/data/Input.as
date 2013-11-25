@@ -9,12 +9,12 @@ package drop.data
 		public static const TOUCH_ENDED : int = 3;
 
 		public var type : int;
-		public var location : Point;
+		public var position : Point;
 
-		public function Input(type : int, location : Point)
+		public function Input(type : int, position : Point)
 		{
 			this.type = type;
-			this.location = location;
+			this.position = position;
 		}
 	}
 }

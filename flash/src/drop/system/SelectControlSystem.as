@@ -107,7 +107,7 @@ package drop.system
 			{
 				reusableRectangle.x = selectNode.transformComponent.x;
 				reusableRectangle.y = selectNode.transformComponent.y;
-				if (reusableRectangle.containsPoint(input.location))
+				if (reusableRectangle.containsPoint(input.position))
 				{
 					return selectNode;
 				}

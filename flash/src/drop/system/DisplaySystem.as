@@ -12,12 +12,14 @@ package drop.system
 	public class DisplaySystem extends System
 	{
 		private var displayObjectContainer : DisplayObjectContainer;
+		private var viewScale : Number;
 
 		private var displayNodeList : NodeList;
 
-		public function DisplaySystem(displayObjectContainer : DisplayObjectContainer)
+		public function DisplaySystem(displayObjectContainer : DisplayObjectContainer, viewScale : Number)
 		{
 			this.displayObjectContainer = displayObjectContainer;
+			this.viewScale = viewScale;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -57,8 +59,8 @@ package drop.system
 
 		private function updateTransform(displayNode : DisplayNode) : void
 		{
-			displayNode.displayComponent.displayObject.x = displayNode.transformComponent.x;
-			displayNode.displayComponent.displayObject.y = displayNode.transformComponent.y;
+			displayNode.displayComponent.displayObject.x = displayNode.transformComponent.x * viewScale;
+			displayNode.displayComponent.displayObject.y = displayNode.transformComponent.y * viewScale;
 		}
 
 		override public function update(time : Number) : void

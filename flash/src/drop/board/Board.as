@@ -13,6 +13,7 @@ package drop.board
 	import drop.system.DeselectSystem;
 	import drop.system.DisplaySystem;
 	import drop.system.FlySystem;
+	import drop.system.HudDisplaySystem;
 	import drop.system.LineBlastDetonationSystem;
 	import drop.system.LineBlastPulseSystem;
 	import drop.system.MatchingStateEndingSystem;
@@ -31,34 +32,60 @@ package drop.board
 	import starling.core.Starling;
 	import starling.display.Quad;
 	import starling.display.Sprite;
+	import starling.events.Event;
+	import starling.text.TextField;
+	import starling.utils.HAlign;
+	import starling.utils.VAlign;
 
 	public class Board extends Sprite
 	{
+		[Embed(source="../../../res/Quicksand-Regular.otf", embedAsCFF="false", fontName="QuicksandLight", mimeType="application/x-font")]
+		public var fontClass : Class;
+
 		public function Board()
 		{
-			var boardSize : Point = new Point(7, 8);
-			var tileSize : int = 90;
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		}
 
-			var quad : Quad = new Quad(640, 960, 0xffffff);
-			addChild(quad);
+		private function onAddedToStage(event : Event) : void
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+			var boardSize : Point = new Point(7, 7);
+			var modelTileSize : int = 90;
+			var viewTileSize : int = int(stage.stageWidth / boardSize.x);
+			var viewScale : Number = viewTileSize / modelTileSize;
+
+			var touchQuad : Quad = new Quad(boardSize.x * viewTileSize, boardSize.y * viewTileSize, 0xffffff);
+			touchQuad.x = touchQuad.y = (stage.stageWidth - boardSize.x * viewTileSize) / 2;
+			addChild(touchQuad);
 
 			var boardContainer : Sprite = new Sprite();
+			boardContainer.x = boardContainer.y = (stage.stageWidth - boardSize.x * viewTileSize) / 2;
+			boardContainer.touchable = false;
 			addChild(boardContainer);
+
+			var textField : TextField = new TextField(stage.stageWidth, stage.stageHeight - boardSize.y * viewTileSize, "0", "QuicksandLight", 100 * viewScale);
+			textField.name = "textField";
+			textField.hAlign = HAlign.CENTER;
+			textField.vAlign = VAlign.CENTER;
+			textField.y = boardSize.y * viewTileSize;
+			addChild(textField);
 
 			var gameState : GameState = new GameState();
 
 			var engine : Engine = new Engine();
 
-			var entityManager : EntityManager = new EntityManager(engine, boardSize, tileSize);
+			var entityManager : EntityManager = new EntityManager(engine, boardSize, viewTileSize);
 
-			var matcher : Matcher = new Matcher(boardSize, tileSize);
+			var matcher : Matcher = new Matcher(boardSize, modelTileSize);
 
 			for (var row : int = 0; row < boardSize.y; row++)
 			{
 				for (var column : int = 0; column < boardSize.x; column++)
 				{
-					var x : Number = column * tileSize;
-					var y : Number = row * tileSize;
+					var x : Number = column * modelTileSize;
+					var y : Number = row * modelTileSize;
 					if (row == 0)
 					{
 						engine.addEntity(entityManager.createSpawner(x, y));
@@ -78,8 +105,8 @@ package drop.board
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var selectingState : EngineState = stateMachine.createState("selecting");
-			selectingState.addInstance(new TouchInputSystem(quad, gameState)).withPriority(SystemPriorities.INPUT);
-			selectingState.addInstance(new SelectControlSystem(gameState, tileSize)).withPriority(SystemPriorities.CONTROL);
+			selectingState.addInstance(new TouchInputSystem(touchQuad, viewScale, gameState)).withPriority(SystemPriorities.INPUT);
+			selectingState.addInstance(new SelectControlSystem(gameState, modelTileSize)).withPriority(SystemPriorities.CONTROL);
 			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var submittingState : EngineState = stateMachine.createState("submitting");
@@ -93,15 +120,16 @@ package drop.board
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
 			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new SpawnerSystem(tileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new LineBlastPulseSystem(modelTileSize)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new SpawnerSystem(modelTileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new MoveSystem(boardSize, modelTileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
-			engine.addSystem(new DisplaySystem(boardContainer), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(textField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new DisplaySystem(boardContainer, viewScale), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");
 

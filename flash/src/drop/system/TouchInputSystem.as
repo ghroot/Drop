@@ -6,6 +6,8 @@ package drop.system
 	import drop.data.GameState;
 	import drop.data.Input;
 
+	import flash.geom.Point;
+
 	import starling.display.DisplayObject;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
@@ -14,13 +16,15 @@ package drop.system
 	public class TouchInputSystem extends System
 	{
 		private var boardDisplayObject : DisplayObject;
+		private var viewScale : Number;
 		private var gameState : GameState;
 
 		private var inputsSinceLastUpdate : Vector.<Input>;
 
-		public function TouchInputSystem(boardDisplayObject : DisplayObject, gameState : GameState)
+		public function TouchInputSystem(boardDisplayObject : DisplayObject, viewScale : Number, gameState : GameState)
 		{
 			this.boardDisplayObject = boardDisplayObject;
+			this.viewScale = viewScale;
 			this.gameState = gameState;
 		}
 
@@ -51,17 +55,17 @@ package drop.system
 			var touch : Touch = event.getTouch(boardDisplayObject);
 			if (touch != null)
 			{
+				var position : Point = touch.getLocation(boardDisplayObject);
+				position.x /= viewScale;
+				position.y /= viewScale;
+
 				if (touch.phase == TouchPhase.BEGAN)
 				{
-					inputsSinceLastUpdate.push(new Input(Input.TOUCH_BEGAN, touch.getLocation(boardDisplayObject)));
+					inputsSinceLastUpdate.push(new Input(Input.TOUCH_BEGAN, position));
 				}
 				else if (touch.phase == TouchPhase.MOVED)
 				{
-					inputsSinceLastUpdate.push(new Input(Input.TOUCH_MOVE, touch.getLocation(boardDisplayObject)));
-				}
-				else if (touch.phase == TouchPhase.ENDED)
-				{
-					inputsSinceLastUpdate.push(new Input(Input.TOUCH_ENDED, touch.getLocation(boardDisplayObject)));
+					inputsSinceLastUpdate.push(new Input(Input.TOUCH_MOVE, position));
 				}
 			}
 		}

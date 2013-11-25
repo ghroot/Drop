@@ -45,6 +45,17 @@ package drop.system
 				{
 					matchNode.stateComponent.stateMachine.changeState("matched");
 				}
+
+				var creditsToAdd : int = match.matchNodes.length;
+				if (match.matchNodes.length >= 5)
+				{
+					creditsToAdd *= 3;
+				}
+				else if (match.matchNodes.length >= 4)
+				{
+					creditsToAdd *= 2;
+				}
+				gameState.credits += creditsToAdd;
 			}
 
 			gameState.atLeastOneMatch = matches.length > 0;
