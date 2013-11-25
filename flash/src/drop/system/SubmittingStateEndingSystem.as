@@ -5,16 +5,16 @@ package drop.system
 
 	public class SubmittingStateEndingSystem extends System
 	{
-		private var engineStateMachine : EngineStateMachine;
+		private var stateMachine : EngineStateMachine;
 
 		public function SubmittingStateEndingSystem(engineStateMachine : EngineStateMachine)
 		{
-			this.engineStateMachine = engineStateMachine;
+			this.stateMachine = engineStateMachine;
 		}
 
 		override public function update(time : Number) : void
 		{
-			engineStateMachine.changeState("cascading");
+			stateMachine.changeState("matching");
 		}
 	}
 }

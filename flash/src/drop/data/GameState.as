@@ -3,7 +3,8 @@ package drop.data
 	public class GameState
 	{
 		public var inputs : Vector.<Input>;
-		public var shouldSubmitCurrentSelection : Boolean;
+		public var shouldSubmit : Boolean;
+		public var atLeastOneMatch : Boolean;
 
 		public function GameState()
 		{

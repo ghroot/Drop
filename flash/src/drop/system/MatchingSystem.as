@@ -1,31 +1,53 @@
 package drop.system
 {
-	import ash.core.*;
+	import ash.core.Engine;
+	import ash.core.NodeList;
+	import ash.core.System;
 
-	import drop.node.SelectNode;
+	import drop.board.Match;
+	import drop.board.Matcher;
+	import drop.data.GameState;
+	import drop.node.MatchNode;
 
 	public class MatchingSystem extends System
 	{
-		private var selectNodeList : NodeList;
+		private var matcher : Matcher;
+		private var gameState : GameState;
 
-		public function MatchingSystem()
+		private var matchNodeList : NodeList;
+		private var matchNodes : Vector.<MatchNode>;
+
+		public function MatchingSystem(matcher : Matcher, gameState : GameState)
 		{
+			this.matcher = matcher;
+			this.gameState = gameState;
+
+			matchNodes = new Vector.<MatchNode>();
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			selectNodeList = engine.getNodeList(SelectNode);
+			matchNodeList = engine.getNodeList(MatchNode);
 		}
 
 		override public function update(time : Number) : void
 		{
-			for (var selectNode : SelectNode = selectNodeList.head as SelectNode; selectNode; selectNode = selectNode.next as SelectNode)
+			matchNodes.length = 0;
+			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
 			{
-				if (selectNode.selectComponent.selectionIndex >= 0)
+				matchNodes[matchNodes.length] = matchNode;
+			}
+
+			var matches : Vector.<Match> = matcher.getMatches(matchNodes);
+			for each (var match : Match in matches)
+			{
+				for each (matchNode in match.matchNodes)
 				{
-					selectNode.stateComponent.stateMachine.changeState("matched");
+					matchNode.stateComponent.stateMachine.changeState("matched");
 				}
 			}
+
+			gameState.atLeastOneMatch = matches.length > 0;
 		}
 	}
 }

@@ -1,18 +1,18 @@
 package drop.board
 {
-	import flash.geom.Point;
+	import drop.node.MatchNode;
 
 	public class Match
 	{
-		public var positions : Vector.<Point>;
+		public var matchNodes : Vector.<MatchNode>;
 		private var tileSize : int;
 
 		public var width : int;
 		public var height : int;
 
-		public function Match(positions : Vector.<Point>, tileSize : int)
+		public function Match(matchNodes : Vector.<MatchNode>, tileSize : int)
 		{
-			this.positions = positions;
+			this.matchNodes = matchNodes;
 			this.tileSize = tileSize;
 
 			width = calculateWidth();
@@ -23,10 +23,10 @@ package drop.board
 		{
 			var leftMostPositionX : Number = Number.MAX_VALUE;
 			var rightMostPositionX : Number = 0;
-			for each (var position : Point in positions)
+			for each (var matchNode : MatchNode in matchNodes)
 			{
-				leftMostPositionX = Math.min(leftMostPositionX, position.x);
-				rightMostPositionX = Math.max(rightMostPositionX, position.x);
+				leftMostPositionX = min(leftMostPositionX, matchNode.transformComponent.x);
+				rightMostPositionX = max(rightMostPositionX, matchNode.transformComponent.x);
 			}
 			return rightMostPositionX - leftMostPositionX + tileSize;
 		}
@@ -35,13 +35,22 @@ package drop.board
 		{
 			var topMostPositionY : Number = Number.MAX_VALUE;
 			var bottomMostPositionY : Number = 0;
-			for each (var position : Point in positions)
+			for each (var matchNode : MatchNode in matchNodes)
 			{
-				var positionY : Number = position.y;
-				topMostPositionY = Math.min(topMostPositionY, positionY);
-				bottomMostPositionY = Math.max(bottomMostPositionY, positionY);
+				topMostPositionY = min(topMostPositionY, matchNode.transformComponent.y);
+				bottomMostPositionY = max(bottomMostPositionY, matchNode.transformComponent.y);
 			}
 			return bottomMostPositionY - topMostPositionY + 70;
+		}
+
+		private function min(number1 : Number, number2 : Number) : Number
+		{
+			return number1 < number2 ? number1 : number2;
+		}
+
+		private function max(number1 : Number, number2 : Number) : Number
+		{
+			return number1 > number2 ? number1 : number2;
 		}
 	}
 }

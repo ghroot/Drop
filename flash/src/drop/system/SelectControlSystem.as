@@ -15,11 +15,12 @@ package drop.system
 		private var tileSize : int;
 
 		private var selectNodeList : NodeList;
+		private var selectedSelectNode : SelectNode;
 		private var reusableRectangle : Rectangle;
 
 		public function SelectControlSystem(gameState : GameState, boardSize : Point, tileSize : int)
 		{
-			super(gameState, Vector.<int>([Input.TOUCH_BEGAN, Input.TOUCH_MOVE, Input.TOUCH_ENDED]));
+			super(gameState, Vector.<int>([Input.TOUCH_BEGAN, Input.TOUCH_MOVE]));
 
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
@@ -30,6 +31,9 @@ package drop.system
 		override public function addToEngine(engine : Engine) : void
 		{
 			selectNodeList = engine.getNodeList(SelectNode);
+
+			gameState.shouldSubmit = false;
+			selectedSelectNode = null;
 		}
 
 		override protected function handleInput(input : Input) : void
@@ -45,26 +49,58 @@ package drop.system
 				{
 					handleInputMove(selectNode);
 				}
-				else if (input.type == Input.TOUCH_ENDED)
-				{
-					handleInputEnded(selectNode);
-				}
 			}
 		}
 
 		private function handleInputBegan(selectNode : SelectNode) : void
 		{
-			selectSelectNode(selectNode);
+			if (selectedSelectNode == null)
+			{
+				selectNode.selectComponent.isSelected = true;
+				selectNode.stateComponent.stateMachine.changeState("selected");
+
+				selectedSelectNode = selectNode;
+			}
+			else if (selectedSelectNode.entity == selectNode.entity)
+			{
+				selectedSelectNode.selectComponent.isSelected = false;
+				selectedSelectNode.stateComponent.stateMachine.changeState("idle");
+				selectedSelectNode = null;
+			}
+			else
+			{
+				if (Math.abs(selectedSelectNode.transformComponent.x - selectNode.transformComponent.x) +
+						Math.abs(selectedSelectNode.transformComponent.y - selectNode.transformComponent.y) == tileSize)
+				{
+					selectNode.selectComponent.isSelected = true;
+					selectNode.stateComponent.stateMachine.changeState("selected");
+
+					gameState.shouldSubmit = true;
+				}
+				else
+				{
+					selectedSelectNode.selectComponent.isSelected = false;
+					selectedSelectNode.stateComponent.stateMachine.changeState("idle");
+
+					selectNode.selectComponent.isSelected = true;
+					selectNode.stateComponent.stateMachine.changeState("selected");
+
+					selectedSelectNode = selectNode;
+				}
+			}
 		}
 
 		private function handleInputMove(selectNode : SelectNode) : void
 		{
-			selectSelectNode(selectNode);
-		}
+			if (selectedSelectNode != null &&
+					Math.abs(selectedSelectNode.transformComponent.x - selectNode.transformComponent.x) +
+					Math.abs(selectedSelectNode.transformComponent.y - selectNode.transformComponent.y) == tileSize)
+			{
+				selectNode.selectComponent.isSelected = true;
+				selectNode.stateComponent.stateMachine.changeState("selected");
 
-		private function handleInputEnded(selectNode : SelectNode) : void
-		{
-			gameState.shouldSubmitCurrentSelection = true;
+				gameState.shouldSubmit = true;
+			}
 		}
 
 		private function getSelectNodeForInput(input : Input) : SelectNode
@@ -79,61 +115,6 @@ package drop.system
 				}
 			}
 			return null;
-		}
-
-		private function getLastSelectedSelectNode() : SelectNode
-		{
-			var lastSelectedSelectNode : SelectNode = null;
-			for (var selectNode : SelectNode = selectNodeList.head; selectNode; selectNode = selectNode.next)
-			{
-				if (lastSelectedSelectNode == null ||
-					selectNode.selectComponent.selectionIndex > lastSelectedSelectNode.selectComponent.selectionIndex)
-				{
-					lastSelectedSelectNode = selectNode;
-				}
-			}
-			return lastSelectedSelectNode;
-		}
-
-		private function deselectAllSelectNodesWithSelectionIndexGreaterThan(selectionIndex : int) : void
-		{
-			for (var selectNode : SelectNode = selectNodeList.head; selectNode; selectNode = selectNode.next)
-			{
-				if (selectNode.selectComponent.selectionIndex > selectionIndex)
-				{
-					unselectSelectNode(selectNode);
-				}
-			}
-		}
-
-		private function selectSelectNode(selectNode : SelectNode) : void
-		{
-			var lastSelectedSelectNode : SelectNode = getLastSelectedSelectNode();
-			selectNode.selectComponent.selectionIndex = lastSelectedSelectNode != null ? lastSelectedSelectNode.selectComponent.selectionIndex + 1 : 0;
-
-			updateStatesOnAllSelectNodes();
-		}
-
-		private function unselectSelectNode(selectNode : SelectNode) : void
-		{
-			selectNode.selectComponent.selectionIndex = -1;
-
-			updateStatesOnAllSelectNodes();
-		}
-
-		private function updateStatesOnAllSelectNodes() : void
-		{
-			for (var selectNode : SelectNode = selectNodeList.head; selectNode; selectNode = selectNode.next)
-			{
-				if (selectNode.selectComponent.selectionIndex >= 0)
-				{
-					selectNode.stateComponent.stateMachine.changeState("selected");
-				}
-				else
-				{
-					selectNode.stateComponent.stateMachine.changeState("idle");
-				}
-			}
 		}
 	}
 }

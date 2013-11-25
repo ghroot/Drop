@@ -1,6 +1,5 @@
 package drop.board
 {
-	import drop.*;
 	import ash.core.Engine;
 	import ash.fsm.EngineState;
 	import ash.fsm.EngineStateMachine;
@@ -11,16 +10,19 @@ package drop.board
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
 	import drop.system.CountdownSystem;
+	import drop.system.DeselectSystem;
 	import drop.system.DisplaySystem;
 	import drop.system.FlySystem;
 	import drop.system.LineBlastDetonationSystem;
 	import drop.system.LineBlastPulseSystem;
+	import drop.system.MatchingStateEndingSystem;
 	import drop.system.MatchingSystem;
 	import drop.system.MoveSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
 	import drop.system.SubmittingStateEndingSystem;
+	import drop.system.SwapSystem;
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 
@@ -49,6 +51,8 @@ package drop.board
 
 			var entityManager : EntityManager = new EntityManager(engine, boardSize, tileSize);
 
+			var matcher : Matcher = new Matcher(boardSize, tileSize);
+
 			for (var row : int = 0; row < boardSize.y; row++)
 			{
 				for (var column : int = 0; column < boardSize.x; column++)
@@ -71,30 +75,35 @@ package drop.board
 				}
 			}
 
-			var engineStateMachine : EngineStateMachine = new EngineStateMachine(engine);
+			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
-			var selectingState : EngineState = engineStateMachine.createState("selecting");
+			var selectingState : EngineState = stateMachine.createState("selecting");
 			selectingState.addInstance(new TouchInputSystem(quad, gameState)).withPriority(SystemPriorities.INPUT);
 			selectingState.addInstance(new SelectControlSystem(gameState, boardSize, tileSize)).withPriority(SystemPriorities.CONTROL);
-			selectingState.addInstance(new SelectingStateEndingSystem(engineStateMachine, gameState)).withPriority(SystemPriorities.END);
+			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
-			var submittingState : EngineState = engineStateMachine.createState("submitting");
-			submittingState.addInstance(new MatchingSystem()).withPriority(SystemPriorities.POST_LOGIC);
-			submittingState.addInstance(new SubmittingStateEndingSystem(engineStateMachine)).withPriority(10);
+			var submittingState : EngineState = stateMachine.createState("submitting");
+			submittingState.addInstance(new SwapSystem()).withPriority(SystemPriorities.LOGIC);
+			submittingState.addInstance(new DeselectSystem()).withPriority(SystemPriorities.POST_LOGIC);
+			submittingState.addInstance(new SubmittingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
-			var cascadingState : EngineState = engineStateMachine.createState("cascading");
+			var matchingState : EngineState = stateMachine.createState("matching");
+			matchingState.addInstance(new MatchingSystem(matcher, gameState)).withPriority(SystemPriorities.LOGIC);
+			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
+
+			var cascadingState : EngineState = stateMachine.createState("cascading");
 			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new LineBlastPulseSystem(tileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new SpawnerSystem(tileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new CascadingStateEndingSystem(engineStateMachine)).withPriority(SystemPriorities.END);
+			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new DisplaySystem(boardContainer), SystemPriorities.DISPLAY);
 
-			engineStateMachine.changeState("selecting");
+			stateMachine.changeState("selecting");
 
 			var tickProvider : ITickProvider = new StarlingFixedTickProvider(Starling.juggler, 0.017);
 			tickProvider.add(engine.update);

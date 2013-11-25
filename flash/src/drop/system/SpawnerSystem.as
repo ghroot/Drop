@@ -36,7 +36,7 @@ package drop.system
 				if (canEntityBeCreatedAt(spawnerNode))
 				{
 					var entity : Entity;
-					if (Math.random() <= 0.1)
+					if (/*Math.random() <= 0.1*/false)
 					{
 						entity = entityManager.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
 					}

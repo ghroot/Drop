@@ -276,13 +276,17 @@ package ash.core
 				}
 				var next : Node = end.next;
 				start.previous = end.next = null;
-				lists.push( start );
+				lists[lists.length] = start;
 				start = next;
 			}
 			// reassemble it in order
+			var node1:Node;
+			var node2:Node;
 			while( lists.length > 1 )
 			{
-				lists.push( merge( lists.shift(), lists.shift(), sortFunction ) );
+				node1 = lists.shift();
+				node2 = lists.shift();
+				lists[lists.length] = merge( node1, node2, sortFunction );
 			}
 			// find the tail
 			tail = head = lists[0];

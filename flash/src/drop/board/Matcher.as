@@ -1,183 +1,202 @@
 package drop.board
 {
+	import drop.node.MatchNode;
+
+	import flash.geom.Point;
+
 	public class Matcher
 	{
 		private static const MINIMUM_LINE_LENGTH : uint = 3;
 
-		public function Matcher()
+		private var boardSize : Point;
+		private var tileSize : int;
+
+		private var reusableMatchedMatchNodes : Vector.<MatchNode>;
+		private var reusableHorizontalOrVerticalMatchingNodes : Vector.<MatchNode>;
+
+		public function Matcher(boardSize : Point, tileSize : int)
 		{
+			this.boardSize = boardSize;
+			this.tileSize = tileSize;
+
+			reusableMatchedMatchNodes = new Vector.<MatchNode>();
+			reusableHorizontalOrVerticalMatchingNodes = new Vector.<MatchNode>();
 		}
 
-//		public function getMatches(letterNodes : Vector.<LetterNode>, boardSize : Point, tileSize : int) : Vector.<Match>
-//		{
-//			var matches : Vector.<Match> = new Vector.<Match>();
-//			for each (var letterNode : LetterNode in letterNodes.slice())
-//			{
-//				var match : Match = getMatch(letterNode, letterNodes, boardSize, tileSize);
-//				if (match != null)
-//				{
-//					var matchThatSharesLetterNode : Match = getMatchThatSharesLetterNode(match, matches);
-//					if (matchThatSharesLetterNode != null)
-//					{
-//						if (match.getLetterNodes().length > matchThatSharesLetterNode.getLetterNodes().length)
-//						{
-//							matches.splice(matches.indexOf(matchThatSharesLetterNode), 1);
-//							matches.push(match);
-//						}
-//					}
-//					else
-//					{
-//						matches.push(match);
-//					}
-//				}
-//			}
-//			return matches;
-//		}
-//
-//		public function hasMatches(letterNodes : Vector.<LetterNode>, boardSize : Point, tileSize : int) : Boolean
-//		{
-//			return getMatches(letterNodes, boardSize, tileSize).length > 0;
-//		}
-//
-//		private function getMatchThatSharesLetterNode(match : Match, matches : Vector.<Match>) : Match
-//		{
-//			for each (var match2 : Match in matches)
-//			{
-//				for each (var letterNode1 : LetterNode in match.getLetterNodes())
-//				{
-//					for each (var letterNode2 : LetterNode in match2.getLetterNodes())
-//					{
-//						if (letterNode1.referencesSameEntityAs(letterNode2))
-//						{
-//							return match2;
-//						}
-//					}
-//				}
-//			}
-//			return null;
-//		}
-//
-//		public function getMatch(letterNode : LetterNode, letterNodes : Vector.<LetterNode>, boardSize : Point, tileSize : int) : Match
-//		{
-//			var matchedLetterNodes : Vector.<LetterNode> = new Vector.<LetterNode>();
-//			matchedLetterNodes.push(letterNode);
-//
-//			var letterNodesInHorizontalMatch: Vector.<LetterNode> = getHorizontalMatchingItems(letterNode, letterNodes, boardSize, tileSize);
-//			if (letterNodesInHorizontalMatch.length > 0)
-//			{
-//				matchedLetterNodes = matchedLetterNodes.concat(letterNodesInHorizontalMatch);
-//			}
-//
-//			var letterNodesInVerticalMatch : Vector.<LetterNode> = getVerticalMatchingItems(letterNode, letterNodes, boardSize, tileSize);
-//			if (letterNodesInVerticalMatch.length > 0)
-//			{
-//				matchedLetterNodes = matchedLetterNodes.concat(letterNodesInVerticalMatch);
-//			}
-//
-//			if (matchedLetterNodes.length >= MINIMUM_LINE_LENGTH)
-//			{
-//				return new Match(matchedLetterNodes);
-//			}
-//			else
-//			{
-//				return null;
-//			}
-//		}
-//
-//		private function getHorizontalMatchingItems(letterNode : LetterNode, letterNodes : Vector.<LetterNode>, boardSize : Point, tileSize : int) : Vector.<LetterNode>
-//		{
-//			var letterNodesInHorizontalMatch : Vector.<LetterNode> = new Vector.<LetterNode>();
-//			var currentX : Number = letterNode.transformComponent.position.x - tileSize;
-//			while (currentX >= 0)
-//			{
-//				var letterNodeAtPosition : LetterNode = getLetterNodeAtPosition(letterNodes, new Point(currentX, letterNode.transformComponent.position.y));
-//				if (letterNodeAtPosition != null &&
-//						letterNodeAtPosition.letterComponent.letter == letterNode.letterComponent.letter)
-//				{
-//					letterNodesInHorizontalMatch.push(letterNodeAtPosition);
-//					currentX -= tileSize;
-//				}
-//				else
-//				{
-//					break;
-//				}
-//			}
-//			currentX = letterNode.transformComponent.position.x + tileSize;
-//			while (currentX < boardSize.x * tileSize)
-//			{
-//				letterNodeAtPosition = getLetterNodeAtPosition(letterNodes, new Point(currentX, letterNode.transformComponent.position.y));
-//				if (letterNodeAtPosition != null &&
-//						letterNodeAtPosition.letterComponent.letter == letterNode.letterComponent.letter)
-//				{
-//					letterNodesInHorizontalMatch.push(letterNodeAtPosition);
-//					currentX += tileSize;
-//				}
-//				else
-//				{
-//					break;
-//				}
-//			}
-//
-//			if (letterNodesInHorizontalMatch.length < (MINIMUM_LINE_LENGTH - 1))
-//			{
-//				letterNodesInHorizontalMatch.length = 0;
-//			}
-//
-//			return letterNodesInHorizontalMatch;
-//		}
-//
-//		private function getVerticalMatchingItems(letterNode : LetterNode, letterNodes : Vector.<LetterNode>, boardSize : Point, tileSize : int) : Vector.<LetterNode>
-//		{
-//			var letterNodesInVerticalMatch : Vector.<LetterNode> = new Vector.<LetterNode>();
-//			var currentY : Number = letterNode.transformComponent.position.y - tileSize;
-//			while (currentY >= 0)
-//			{
-//				var letterNodeAtPosition : LetterNode = getLetterNodeAtPosition(letterNodes, new Point(letterNode.transformComponent.position.x, currentY));
-//				if (letterNodeAtPosition != null &&
-//						letterNodeAtPosition.letterComponent.letter == letterNode.letterComponent.letter)
-//				{
-//					letterNodesInVerticalMatch.push(letterNodeAtPosition);
-//					currentY -= tileSize;
-//				}
-//				else
-//				{
-//					break;
-//				}
-//			}
-//			currentY = letterNode.transformComponent.position.y + tileSize;
-//			while (currentY < boardSize.y * tileSize)
-//			{
-//				letterNodeAtPosition = getLetterNodeAtPosition(letterNodes, new Point(letterNode.transformComponent.position.x, currentY));
-//				if (letterNodeAtPosition != null &&
-//						letterNodeAtPosition.letterComponent.letter == letterNode.letterComponent.letter)
-//				{
-//					letterNodesInVerticalMatch.push(letterNodeAtPosition);
-//					currentY += tileSize;
-//				}
-//				else
-//				{
-//					break;
-//				}
-//			}
-//
-//			if (letterNodesInVerticalMatch.length < (MINIMUM_LINE_LENGTH - 1))
-//			{
-//				letterNodesInVerticalMatch.length = 0;
-//			}
-//
-//			return letterNodesInVerticalMatch;
-//		}
-//
-//		private function getLetterNodeAtPosition(letterNodes : Vector.<LetterNode>, position : Point) : LetterNode
-//		{
-//			for each (var letterNode : LetterNode in letterNodes)
-//			{
-//				if (letterNode.transformComponent.position.equals(position))
-//				{
-//					return letterNode;
-//				}
-//			}
-//			return null;
-//		}
+		public function getMatches(matchNodes : Vector.<MatchNode>) : Vector.<Match>
+		{
+			var matches : Vector.<Match> = new Vector.<Match>();
+			for each (var matchNode : MatchNode in matchNodes)
+			{
+				var match : Match = getMatch(matchNode, matchNodes);
+				if (match != null)
+				{
+					var matchThatSharesMatchNode : Match = getMatchThatSharesMatchNode(match, matches);
+					if (matchThatSharesMatchNode != null)
+					{
+						if (match.matchNodes.length > matchThatSharesMatchNode.matchNodes.length)
+						{
+							matches.splice(matches.indexOf(matchThatSharesMatchNode), 1);
+							matches[matches.length] = match;
+						}
+					}
+					else
+					{
+						matches[matches.length] = match;
+					}
+				}
+			}
+			return matches;
+		}
+
+		public function hasMatches(matchNodes : Vector.<MatchNode>) : Boolean
+		{
+			return getMatches(matchNodes).length > 0;
+		}
+
+		private function getMatchThatSharesMatchNode(match : Match, matches : Vector.<Match>) : Match
+		{
+			for each (var otherMatch : Match in matches)
+			{
+				for each (var matchNodeInMatch : MatchNode in match.matchNodes)
+				{
+					for each (var matchNodeInOtherMatch : MatchNode in otherMatch.matchNodes)
+					{
+						if (matchNodeInMatch.entity == matchNodeInOtherMatch.entity)
+						{
+							return otherMatch;
+						}
+					}
+				}
+			}
+			return null;
+		}
+
+		public function getMatch(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Match
+		{
+			reusableMatchedMatchNodes.length = 0;
+
+			reusableMatchedMatchNodes.push(matchNode);
+
+			var matchNodesInHorizontalMatch : Vector.<MatchNode> = getHorizontalMatchingNodes(matchNode, matchNodes);
+			for each (var matchNodeInHorizontalMatch : MatchNode in matchNodesInHorizontalMatch)
+			{
+				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInHorizontalMatch;
+			}
+
+			var matchNodesInVerticalMatch : Vector.<MatchNode> = getVerticalMatchingNodes(matchNode, matchNodes);
+			for each (var matchNodeInVerticalMatch : MatchNode in matchNodesInVerticalMatch)
+			{
+				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInVerticalMatch;
+			}
+
+			if (reusableMatchedMatchNodes.length >= MINIMUM_LINE_LENGTH)
+			{
+				return new Match(reusableMatchedMatchNodes.slice(), tileSize);
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		private function getHorizontalMatchingNodes(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Vector.<MatchNode>
+		{
+			reusableHorizontalOrVerticalMatchingNodes.length = 0;
+
+			var currentX : Number = matchNode.transformComponent.x - tileSize;
+			while (currentX >= 0)
+			{
+				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodes, currentX, matchNode.transformComponent.y);
+				if (matchNodeAtPosition != null &&
+						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+				{
+					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
+					currentX -= tileSize;
+				}
+				else
+				{
+					break;
+				}
+			}
+			currentX = matchNode.transformComponent.x + tileSize;
+			while (currentX < boardSize.x * tileSize)
+			{
+				matchNodeAtPosition = getMatchNodeAtPosition(matchNodes, currentX, matchNode.transformComponent.y);
+				if (matchNodeAtPosition != null &&
+						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+				{
+					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
+					currentX += tileSize;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			if (reusableHorizontalOrVerticalMatchingNodes.length < MINIMUM_LINE_LENGTH - 1)
+			{
+				reusableHorizontalOrVerticalMatchingNodes.length = 0;
+			}
+
+			return reusableHorizontalOrVerticalMatchingNodes;
+		}
+
+		private function getVerticalMatchingNodes(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Vector.<MatchNode>
+		{
+			reusableHorizontalOrVerticalMatchingNodes.length = 0;
+
+			var currentY : Number = matchNode.transformComponent.y - tileSize;
+			while (currentY >= 0)
+			{
+				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodes, matchNode.transformComponent.x, currentY);
+				if (matchNodeAtPosition != null &&
+						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+				{
+					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
+					currentY -= tileSize;
+				}
+				else
+				{
+					break;
+				}
+			}
+			currentY = matchNode.transformComponent.y + tileSize;
+			while (currentY < boardSize.y * tileSize)
+			{
+				matchNodeAtPosition = getMatchNodeAtPosition(matchNodes, matchNode.transformComponent.x, currentY);
+				if (matchNodeAtPosition != null &&
+						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+				{
+					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
+					currentY += tileSize;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			if (reusableHorizontalOrVerticalMatchingNodes.length < MINIMUM_LINE_LENGTH - 1)
+			{
+				reusableHorizontalOrVerticalMatchingNodes.length = 0;
+			}
+
+			return reusableHorizontalOrVerticalMatchingNodes;
+		}
+
+		private function getMatchNodeAtPosition(matchNodes : Vector.<MatchNode>, positionX : Number, positionY : Number) : MatchNode
+		{
+			for each (var matchNode : MatchNode in matchNodes)
+			{
+				if (matchNode.transformComponent.x == positionX &&
+						matchNode.transformComponent.y == positionY)
+				{
+					return matchNode;
+				}
+			}
+			return null;
+		}
 	}
 }

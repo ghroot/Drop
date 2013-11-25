@@ -28,7 +28,7 @@ package drop.system
 		{
 			if (hasBoardSettled())
 			{
-				engineStateMachine.changeState("selecting");
+				engineStateMachine.changeState("matching");
 			}
 		}
 

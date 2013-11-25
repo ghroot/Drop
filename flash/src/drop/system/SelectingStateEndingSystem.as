@@ -19,12 +19,12 @@ package drop.system
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			gameState.shouldSubmitCurrentSelection = false;
+			gameState.shouldSubmit = false;
 		}
 
 		override public function update(time : Number) : void
 		{
-			if (gameState.shouldSubmitCurrentSelection)
+			if (gameState.shouldSubmit)
 			{
 				engineStateMachine.changeState("submitting");
 			}

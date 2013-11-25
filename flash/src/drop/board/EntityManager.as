@@ -15,6 +15,7 @@ package drop.board
 	import drop.component.LineBlastComponent;
 	import drop.component.LineBlastPulseComponent;
 	import drop.component.LineBlastTargetComponent;
+	import drop.component.MatchComponent;
 	import drop.component.MoveComponent;
 	import drop.component.SelectComponent;
 	import drop.component.SpawnerComponent;
@@ -31,11 +32,19 @@ package drop.board
 		private var boardSize : Point;
 		private var tileSize : int;
 
+		private var colors : Vector.<int>;
+
 		public function EntityManager(engine : Engine, boardSize : Point, tileSize : int)
 		{
 			this.engine = engine;
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
+
+			colors = new Vector.<int>();
+			for (var i : int = 0; i < 5; i++)
+			{
+				colors[colors.length] = Math.random() * 16777215;
+			}
 		}
 
 		public function createTile(x : Number, y : Number) : Entity
@@ -44,7 +53,7 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var color : int = Math.random() * 16777215;
+			var color : int = colors[Math.floor(Math.random() * colors.length)];
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
@@ -68,6 +77,7 @@ package drop.board
 			entity.add(BlockComponent.create());
 			entity.add(MoveComponent.create());
 			entity.add(SelectComponent.create());
+			entity.add(MatchComponent.create().withColor(color));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
 			stateMachine.changeState("idle");
@@ -84,7 +94,7 @@ package drop.board
 			var triggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create().withIsTriggered(true);
 			var nonTriggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create();
 
-			var color : int = 0xaaaaaa;
+			var color : int = colors[Math.floor(Math.random() * colors.length)];
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
@@ -116,6 +126,7 @@ package drop.board
 			entity.add(BlockComponent.create());
 			entity.add(MoveComponent.create());
 			entity.add(SelectComponent.create());
+			entity.add(MatchComponent.create().withColor(color));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
 			stateMachine.changeState("idle");

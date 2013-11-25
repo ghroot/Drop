@@ -4,7 +4,7 @@ package drop.component
 
 	public class SelectComponent
 	{
-		public var selectionIndex : int;
+		public var isSelected : Boolean;
 
 		public static function create() : SelectComponent
 		{
@@ -15,12 +15,12 @@ package drop.component
 
 		public function reset() : void
 		{
-			selectionIndex = -1;
+			isSelected = false;
 		}
 
-		public function withSelectionIndex(value : int) : SelectComponent
+		public function withIsSelected(value : Boolean) : SelectComponent
 		{
-			selectionIndex = value;
+			isSelected = value;
 			return this;
 		}
 	}
