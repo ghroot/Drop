@@ -11,18 +11,16 @@ package drop.system
 
 	public class SelectControlSystem extends AbstractControlSystem
 	{
-		private var boardSize : Point;
 		private var tileSize : int;
 
 		private var selectNodeList : NodeList;
 		private var selectedSelectNode : SelectNode;
 		private var reusableRectangle : Rectangle;
 
-		public function SelectControlSystem(gameState : GameState, boardSize : Point, tileSize : int)
+		public function SelectControlSystem(gameState : GameState, tileSize : int)
 		{
 			super(gameState, Vector.<int>([Input.TOUCH_BEGAN, Input.TOUCH_MOVE]));
 
-			this.boardSize = boardSize;
 			this.tileSize = tileSize;
 
 			reusableRectangle = new Rectangle(0, 0, tileSize, tileSize);

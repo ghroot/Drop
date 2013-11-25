@@ -79,11 +79,11 @@ package drop.board
 
 			var selectingState : EngineState = stateMachine.createState("selecting");
 			selectingState.addInstance(new TouchInputSystem(quad, gameState)).withPriority(SystemPriorities.INPUT);
-			selectingState.addInstance(new SelectControlSystem(gameState, boardSize, tileSize)).withPriority(SystemPriorities.CONTROL);
+			selectingState.addInstance(new SelectControlSystem(gameState, tileSize)).withPriority(SystemPriorities.CONTROL);
 			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var submittingState : EngineState = stateMachine.createState("submitting");
-			submittingState.addInstance(new SwapSystem()).withPriority(SystemPriorities.LOGIC);
+			submittingState.addInstance(new SwapSystem(matcher)).withPriority(SystemPriorities.LOGIC);
 			submittingState.addInstance(new DeselectSystem()).withPriority(SystemPriorities.POST_LOGIC);
 			submittingState.addInstance(new SubmittingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
