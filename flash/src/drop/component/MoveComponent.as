@@ -4,11 +4,11 @@ package drop.component
 
 	public class MoveComponent
 	{
-		public static const FALL_ACCELERATION : int = 160;
-		public static const FALL_VELOCITY : int = 10;
-		public static const SLIDE_ACCELERATION : int = 160;
-		public static const SLIDE_VELOCITY : int = 0;
-		public static const MAX_VELOCITY : int = 1200;
+		public static const FALL_ACCELERATION : Number = 1;
+		public static const FALL_VELOCITY : Number = 0.1;
+		public static const SLIDE_ACCELERATION : Number = 1;
+		public static const SLIDE_VELOCITY : Number = 0;
+		public static const MAX_VELOCITY : Number = 15;
 
 		public var velocityX : Number;
 		public var velocityY : Number;

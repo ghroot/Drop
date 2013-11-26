@@ -44,7 +44,7 @@ package drop.system
 			{
 				if (isMoving(moveNode))
 				{
-					applyAccelerationAndVelocity(moveNode, time);
+					applyAccelerationAndVelocity(moveNode);
 
 					if (shouldStopMoving(moveNode))
 					{
@@ -97,7 +97,7 @@ package drop.system
 					moveNode.moveComponent.accelerationY != 0;
 		}
 
-		private function applyAccelerationAndVelocity(moveNode : MoveNode, time : Number) : void
+		private function applyAccelerationAndVelocity(moveNode : MoveNode) : void
 		{
 			moveNode.moveComponent.velocityX += moveNode.moveComponent.accelerationX;
 			moveNode.moveComponent.velocityY += moveNode.moveComponent.accelerationY;
@@ -111,8 +111,8 @@ package drop.system
 				moveNode.moveComponent.velocityY *= MoveComponent.MAX_VELOCITY;
 			}
 
-			moveNode.transformComponent.x += moveNode.moveComponent.velocityX * time;
-			moveNode.transformComponent.y += moveNode.moveComponent.velocityY * time;
+			moveNode.transformComponent.x += moveNode.moveComponent.velocityX;
+			moveNode.transformComponent.y += moveNode.moveComponent.velocityY;
 
 			updatePreviousPositionThatMoveNodeIsMovingTowards(moveNode);
 			updatePositionThatMoveNodeIsMovingTowards(moveNode);

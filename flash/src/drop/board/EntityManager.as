@@ -30,15 +30,15 @@ package drop.board
 	{
 		private var engine : Engine;
 		private var boardSize : Point;
-		private var viewTileSize : int;
+		private var tileSize : int;
 
 		private var colors : Vector.<int>;
 
-		public function EntityManager(engine : Engine, boardSize : Point, viewTileSize : int)
+		public function EntityManager(engine : Engine, boardSize : Point, tileSize : int)
 		{
 			this.engine = engine;
 			this.boardSize = boardSize;
-			this.viewTileSize = viewTileSize;
+			this.tileSize = tileSize;
 
 			colors = new Vector.<int>();
 			for (var i : int = 0; i < 5; i++)
@@ -57,12 +57,12 @@ package drop.board
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
-			var idleQuad : Quad = new Quad(viewTileSize, viewTileSize, color);
+			var idleQuad : Quad = new Quad(tileSize, tileSize, color);
 			idleQuad.touchable = false;
 			idleState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(idleQuad));
 
 			var selectedState : EntityState = stateMachine.createState("selected");
-			var selectedQuad : Quad = new Quad(viewTileSize - 10, viewTileSize - 10, color);
+			var selectedQuad : Quad = new Quad(tileSize - 10, tileSize - 10, color);
 			selectedQuad.pivotX = selectedQuad.pivotY = -5;
 			selectedQuad.touchable = false;
 			selectedState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(selectedQuad));
@@ -99,13 +99,13 @@ package drop.board
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
-			var idleQuad : Quad = new Quad(viewTileSize, viewTileSize, color);
+			var idleQuad : Quad = new Quad(tileSize, tileSize, color);
 			idleQuad.touchable = false;
 			idleState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(idleQuad));
 
 			var selectedState : EntityState = stateMachine.createState("selected");
 			selectedState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
-			var selectedQuad : Quad = new Quad(viewTileSize - 10, viewTileSize - 10, color);
+			var selectedQuad : Quad = new Quad(tileSize - 10, tileSize - 10, color);
 			selectedQuad.pivotX = selectedQuad.pivotY = -5;
 			selectedQuad.touchable = false;
 			selectedState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(selectedQuad));
@@ -138,13 +138,13 @@ package drop.board
 		{
 			var entity : Entity = new Entity();
 
-			var quad : Quad = new Quad(viewTileSize / 2, viewTileSize / 2, 0xcccccc);
-			quad.pivotX = quad.pivotY = -viewTileSize / 4;
+			var quad : Quad = new Quad(tileSize / 2, tileSize / 2, 0xcccccc);
+			quad.pivotX = quad.pivotY = -tileSize / 4;
 			quad.touchable = false;
 			entity.add(DisplayComponent.create().withDisplayObject(quad));
 
 			entity.add(FlyComponent.create().withVelocityX(extend(blastDirectionX, 16)).withVelocityY(extend(blastDirectionY, 16)));
-			entity.add(BoundsComponent.create().withWidth(boardSize.x * viewTileSize).withHeight(boardSize.y * viewTileSize));
+			entity.add(BoundsComponent.create().withWidth(boardSize.x * tileSize).withHeight(boardSize.y * tileSize));
 			entity.add(TransformComponent.create().withX(x + cap(blastDirectionX, 30)).withY(y + cap(blastDirectionY, 30)));
 			entity.add(LineBlastPulseComponent.create());
 
