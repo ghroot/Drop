@@ -12,14 +12,16 @@ package drop.system
 	public class DisplaySystem extends System
 	{
 		private var displayObjectContainer : DisplayObjectContainer;
-		private var tileSize : int;
+		private var scaleFactor : Number;
+		private var viewTileSize : int;
 
 		private var displayNodeList : NodeList;
 
-		public function DisplaySystem(displayObjectContainer : DisplayObjectContainer, tileSize : int)
+		public function DisplaySystem(displayObjectContainer : DisplayObjectContainer, scaleFactor : Number, viewTileSize : int)
 		{
 			this.displayObjectContainer = displayObjectContainer;
-			this.tileSize = tileSize;
+			this.scaleFactor = scaleFactor;
+			this.viewTileSize = viewTileSize;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -59,8 +61,8 @@ package drop.system
 
 		private function updateTransform(displayNode : DisplayNode) : void
 		{
-			displayNode.displayComponent.displayObject.x = int(displayNode.transformComponent.x + tileSize / 2);
-			displayNode.displayComponent.displayObject.y = int(displayNode.transformComponent.y + tileSize / 2);
+			displayNode.displayComponent.displayObject.x = int(displayNode.transformComponent.x * scaleFactor + viewTileSize / 2);
+			displayNode.displayComponent.displayObject.y = int(displayNode.transformComponent.y * scaleFactor + viewTileSize / 2);
 			displayNode.displayComponent.displayObject.scaleX = displayNode.transformComponent.scale;
 			displayNode.displayComponent.displayObject.scaleY = displayNode.transformComponent.scale;
 		}

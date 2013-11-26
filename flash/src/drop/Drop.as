@@ -11,8 +11,6 @@ package drop
 
 	import starling.core.Starling;
 	import starling.events.Event;
-	import starling.textures.Texture;
-	import starling.utils.AssetManager;
 	import starling.utils.HAlign;
 	import starling.utils.RectangleUtil;
 	import starling.utils.ScaleMode;
@@ -31,37 +29,26 @@ package drop
 
 		public function Drop()
 		{
-			var stageWidth : int  = 320;
-			var stageHeight : int = 480;
 			var iOS : Boolean = Capabilities.manufacturer.indexOf("iOS") != -1;
 
 			Starling.multitouchEnabled = true;
 			Starling.handleLostContext = !iOS;
 
-			var viewPort : Rectangle = RectangleUtil.fit(
-					new Rectangle(0, 0, stageWidth, stageHeight),
-					new Rectangle(0, 0, stage.fullScreenWidth, stage.fullScreenHeight),
-					ScaleMode.SHOW_ALL, iOS);
-
-			var scaleFactor : int = viewPort.width < 480 ? 1 : 2;
-			var assets : AssetManager = new AssetManager(scaleFactor);
+			var scaleFactor : int = stage.fullScreenWidth < 480 ? 1 : 2;
 
 			var startupBitmapClass : Class = scaleFactor == 1 ? StartupBitmap : StartupBitmapHd;
 			var startupBitmap : Bitmap = new startupBitmapClass();
 			StartupBitmap = StartupBitmapHd = null;
-			startupBitmap.x = viewPort.x;
-			startupBitmap.y = viewPort.y;
-			startupBitmap.width  = viewPort.width;
-			startupBitmap.height = viewPort.height;
-			startupBitmap.smoothing = true;
+			startupBitmap.x = (stage.fullScreenWidth - startupBitmap.width) / 2;
+			startupBitmap.y = (stage.fullScreenHeight - startupBitmap.height) / 2;
 			addChild(startupBitmap);
 
-			mStarling = new Starling(Board, stage, viewPort);
-			mStarling.stage.stageWidth  = stageWidth;
-			mStarling.stage.stageHeight = stageHeight;
+			mStarling = new Starling(Board, stage);
 			mStarling.simulateMultitouch  = false;
 			mStarling.enableErrorChecking = false;
 			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
+
+			stage.addEventListener(flash.events.Event.RESIZE, onResize);
 
 			mStarling.addEventListener(starling.events.Event.ROOT_CREATED, function(event : *) : void
 			{
@@ -69,8 +56,7 @@ package drop
 				startupBitmap = null;
 
 				var board : Board = mStarling.root as Board;
-				var startupTexture : Texture = Texture.fromEmbeddedAsset(startupBitmapClass, false, false, scaleFactor);
-				board.start(startupTexture, assets);
+				board.start(scaleFactor);
 				mStarling.start();
 			});
 
@@ -82,6 +68,19 @@ package drop
 			{
 				mStarling.stop(true);
 			});
+		}
+
+		private function onResize(event : *) : void
+		{
+			if (mStarling != null)
+			{
+				mStarling.stage.stageWidth = stage.stageWidth;
+				mStarling.stage.stageHeight = stage.stageHeight;
+				const viewPort : Rectangle = mStarling.viewPort;
+				viewPort.width = stage.stageWidth;
+				viewPort.height = stage.stageHeight;
+				mStarling.viewPort = viewPort;
+			}
 		}
 	}
 }
