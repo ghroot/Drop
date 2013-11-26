@@ -21,7 +21,6 @@ package drop.board
 	import drop.component.SpawnerComponent;
 	import drop.component.StateComponent;
 	import drop.component.TransformComponent;
-	import drop.component.script.MatchedAnimationScript;
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
 	import drop.util.DisplayUtils;
@@ -29,6 +28,7 @@ package drop.board
 	import flash.geom.Point;
 
 	import starling.display.Quad;
+	import starling.display.Sprite;
 
 	public class EntityManager
 	{
@@ -79,7 +79,7 @@ package drop.board
 			selectedState.add(DisplayComponent).withInstance(displayComponent);
 
 			var matchedState : EntityState = stateMachine.createState("matched");
-			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new MatchedAnimationScript(transformComponent)));
+			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.4)));
 			matchedState.add(DisplayComponent).withInstance(displayComponent);
 			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.4));
 
@@ -103,27 +103,38 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
+			var color : int = colors[Math.floor(Math.random() * colors.length)];
+			var sprite : Sprite = new Sprite();
+			var quad : Quad = new Quad(viewTileSize, viewTileSize, color);
+			sprite.addChild(quad);
+			var smallQuad : Quad = new Quad(viewTileSize / 4, viewTileSize / 4, 0xffffff);
+			smallQuad.x = smallQuad.y = 1.5 * viewTileSize / 4;
+			sprite.addChild(smallQuad);
+			DisplayUtils.centerPivot(sprite);
+			sprite.touchable = false;
+
+			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
+			var selectComponent : SelectComponent = SelectComponent.create();
+			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(sprite);
 			var triggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create().withIsTriggered(true);
 			var nonTriggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create();
-
-			var color : int = colors[Math.floor(Math.random() * colors.length)];
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
-			var idleQuad : Quad = new Quad(viewTileSize, viewTileSize, color);
-			idleQuad.touchable = false;
-			idleState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(idleQuad));
+			idleState.add(SelectComponent).withInstance(selectComponent);
+			idleState.add(DisplayComponent).withInstance(displayComponent);
 
 			var selectedState : EntityState = stateMachine.createState("selected");
+			selectedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0.75)));
+			selectedState.add(SelectComponent).withInstance(selectComponent);
 			selectedState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
-			var selectedQuad : Quad = new Quad(viewTileSize - 10, viewTileSize - 10, color);
-			selectedQuad.pivotX = selectedQuad.pivotY = -5;
-			selectedQuad.touchable = false;
-			selectedState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(selectedQuad));
+			selectedState.add(DisplayComponent).withInstance(displayComponent);
 
 			var matchedState : EntityState = stateMachine.createState("matched");
-			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withStateToChangeTo("triggered"));
+			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.4)));
+			matchedState.add(DisplayComponent).withInstance(displayComponent);
+			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.4).withStateToChangeTo("triggered"));
 
 			var triggeredState : EntityState = stateMachine.createState("triggered");
 			triggeredState.add(LineBlastComponent).withInstance(triggeredLineBlastComponent);
@@ -134,10 +145,9 @@ package drop.board
 			var destroyedByLineBlastState : EntityState = stateMachine.createState("destroyedByLineBlast");
 			destroyedByLineBlastState.add(CountdownComponent).withInstance(CountdownComponent.create().withStateToChangeTo("triggered"));
 
-			entity.add(TransformComponent.create().withX(x).withY(y));
+			entity.add(transformComponent);
 			entity.add(BlockComponent.create());
 			entity.add(MoveComponent.create());
-			entity.add(SelectComponent.create());
 			entity.add(MatchComponent.create().withColor(color));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
@@ -150,12 +160,12 @@ package drop.board
 		{
 			var entity : Entity = new Entity();
 
-			var quad : Quad = new Quad(viewTileSize / 2, viewTileSize / 2, 0xcccccc);
-			quad.pivotX = quad.pivotY = -viewTileSize / 4;
+			var quad : Quad = new Quad(viewTileSize / 3, viewTileSize / 3, 0x000000);
+			DisplayUtils.centerPivot(quad);
 			quad.touchable = false;
 			entity.add(DisplayComponent.create().withDisplayObject(quad));
 
-			entity.add(FlyComponent.create().withVelocityX(extend(blastDirectionX, 16)).withVelocityY(extend(blastDirectionY, 16)));
+			entity.add(FlyComponent.create().withVelocityX(extend(blastDirectionX, 8)).withVelocityY(extend(blastDirectionY, 8)));
 			entity.add(BoundsComponent.create().withWidth(boardSize.x * modelTileSize).withHeight(boardSize.y * modelTileSize));
 			entity.add(TransformComponent.create().withX(x + cap(blastDirectionX, 30)).withY(y + cap(blastDirectionY, 30)));
 			entity.add(LineBlastPulseComponent.create());

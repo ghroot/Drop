@@ -20,6 +20,7 @@ package drop.component.script
 
 		public function reset() : void
 		{
+			scripts.length = 0;
 		}
 
 		public function withScript(script : Script) : ScriptComponent

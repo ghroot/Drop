@@ -1,5 +1,7 @@
 package drop.board
 {
+	import ash.core.NodeList;
+
 	import drop.node.MatchNode;
 
 	import flash.geom.Point;
@@ -23,12 +25,12 @@ package drop.board
 			reusableHorizontalOrVerticalMatchingNodes = new Vector.<MatchNode>();
 		}
 
-		public function getMatches(matchNodes : Vector.<MatchNode>) : Vector.<Match>
+		public function getMatches(matchNodeList : NodeList) : Vector.<Match>
 		{
 			var matches : Vector.<Match> = new Vector.<Match>();
-			for each (var matchNode : MatchNode in matchNodes)
+			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
 			{
-				var match : Match = getMatch(matchNode, matchNodes);
+				var match : Match = getMatch(matchNode, matchNodeList);
 				if (match != null)
 				{
 					var matchThatSharesMatchNode : Match = getMatchThatSharesMatchNode(match, matches);
@@ -49,9 +51,9 @@ package drop.board
 			return matches;
 		}
 
-		public function hasMatches(matchNodes : Vector.<MatchNode>) : Boolean
+		public function hasMatches(matchNodeList : NodeList) : Boolean
 		{
-			return getMatches(matchNodes).length > 0;
+			return getMatches(matchNodeList).length > 0;
 		}
 
 		private function getMatchThatSharesMatchNode(match : Match, matches : Vector.<Match>) : Match
@@ -72,19 +74,19 @@ package drop.board
 			return null;
 		}
 
-		public function getMatch(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Match
+		public function getMatch(matchNode : MatchNode, matchNodeList : NodeList) : Match
 		{
 			reusableMatchedMatchNodes.length = 0;
 
 			reusableMatchedMatchNodes.push(matchNode);
 
-			var matchNodesInHorizontalMatch : Vector.<MatchNode> = getHorizontalMatchingNodes(matchNode, matchNodes);
+			var matchNodesInHorizontalMatch : Vector.<MatchNode> = getHorizontalMatchingNodes(matchNode, matchNodeList);
 			for each (var matchNodeInHorizontalMatch : MatchNode in matchNodesInHorizontalMatch)
 			{
 				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInHorizontalMatch;
 			}
 
-			var matchNodesInVerticalMatch : Vector.<MatchNode> = getVerticalMatchingNodes(matchNode, matchNodes);
+			var matchNodesInVerticalMatch : Vector.<MatchNode> = getVerticalMatchingNodes(matchNode, matchNodeList);
 			for each (var matchNodeInVerticalMatch : MatchNode in matchNodesInVerticalMatch)
 			{
 				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInVerticalMatch;
@@ -100,14 +102,14 @@ package drop.board
 			}
 		}
 
-		private function getHorizontalMatchingNodes(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Vector.<MatchNode>
+		private function getHorizontalMatchingNodes(matchNode : MatchNode, matchNodeList : NodeList) : Vector.<MatchNode>
 		{
 			reusableHorizontalOrVerticalMatchingNodes.length = 0;
 
 			var currentX : Number = matchNode.transformComponent.x - tileSize;
 			while (currentX >= 0)
 			{
-				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodes, currentX, matchNode.transformComponent.y);
+				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodeList, currentX, matchNode.transformComponent.y);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
 				{
@@ -122,7 +124,7 @@ package drop.board
 			currentX = matchNode.transformComponent.x + tileSize;
 			while (currentX < boardSize.x * tileSize)
 			{
-				matchNodeAtPosition = getMatchNodeAtPosition(matchNodes, currentX, matchNode.transformComponent.y);
+				matchNodeAtPosition = getMatchNodeAtPosition(matchNodeList, currentX, matchNode.transformComponent.y);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
 				{
@@ -143,14 +145,14 @@ package drop.board
 			return reusableHorizontalOrVerticalMatchingNodes;
 		}
 
-		private function getVerticalMatchingNodes(matchNode : MatchNode, matchNodes : Vector.<MatchNode>) : Vector.<MatchNode>
+		private function getVerticalMatchingNodes(matchNode : MatchNode, matchNodeList : NodeList) : Vector.<MatchNode>
 		{
 			reusableHorizontalOrVerticalMatchingNodes.length = 0;
 
 			var currentY : Number = matchNode.transformComponent.y - tileSize;
 			while (currentY >= 0)
 			{
-				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodes, matchNode.transformComponent.x, currentY);
+				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodeList, matchNode.transformComponent.x, currentY);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
 				{
@@ -165,7 +167,7 @@ package drop.board
 			currentY = matchNode.transformComponent.y + tileSize;
 			while (currentY < boardSize.y * tileSize)
 			{
-				matchNodeAtPosition = getMatchNodeAtPosition(matchNodes, matchNode.transformComponent.x, currentY);
+				matchNodeAtPosition = getMatchNodeAtPosition(matchNodeList, matchNode.transformComponent.x, currentY);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
 				{
@@ -186,9 +188,9 @@ package drop.board
 			return reusableHorizontalOrVerticalMatchingNodes;
 		}
 
-		private function getMatchNodeAtPosition(matchNodes : Vector.<MatchNode>, positionX : Number, positionY : Number) : MatchNode
+		private function getMatchNodeAtPosition(matchNodeList : NodeList, positionX : Number, positionY : Number) : MatchNode
 		{
-			for each (var matchNode : MatchNode in matchNodes)
+			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
 			{
 				if (matchNode.transformComponent.x == positionX &&
 						matchNode.transformComponent.y == positionY)

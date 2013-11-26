@@ -7,6 +7,10 @@ package drop.system
 
 	import drop.node.DisplayNode;
 
+	import starling.animation.IAnimatable;
+
+	import starling.animation.IAnimatable;
+
 	import starling.display.DisplayObjectContainer;
 
 	public class DisplaySystem extends System
@@ -74,6 +78,11 @@ package drop.system
 			for (var displayNode : DisplayNode = displayNodeList.head; displayNode; displayNode = displayNode.next)
 			{
 				updateTransform(displayNode);
+
+				if (displayNode.displayComponent.displayObject is IAnimatable)
+				{
+					IAnimatable(displayNode.displayComponent.displayObject).advanceTime(time);
+				}
 			}
 		}
 

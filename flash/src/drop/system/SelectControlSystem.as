@@ -6,7 +6,6 @@ package drop.system
 	import drop.data.Input;
 	import drop.node.SelectNode;
 
-	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
 	public class SelectControlSystem extends AbstractControlSystem
@@ -14,7 +13,6 @@ package drop.system
 		private var tileSize : int;
 
 		private var selectNodeList : NodeList;
-		private var selectedSelectNode : SelectNode;
 		private var reusableRectangle : Rectangle;
 
 		public function SelectControlSystem(gameState : GameState, tileSize : int)
@@ -31,7 +29,6 @@ package drop.system
 			selectNodeList = engine.getNodeList(SelectNode);
 
 			gameState.shouldStartSwap = false;
-			selectedSelectNode = null;
 		}
 
 		override protected function handleInput(input : Input) : void
@@ -52,18 +49,16 @@ package drop.system
 
 		private function handleInputBegan(selectNode : SelectNode) : void
 		{
+			var selectedSelectNode : SelectNode = getSelectedNode();
 			if (selectedSelectNode == null)
 			{
 				selectNode.selectComponent.isSelected = true;
 				selectNode.stateComponent.stateMachine.changeState("selected");
-
-				selectedSelectNode = selectNode;
 			}
 			else if (selectedSelectNode.entity == selectNode.entity)
 			{
 				selectedSelectNode.selectComponent.isSelected = false;
 				selectedSelectNode.stateComponent.stateMachine.changeState("idle");
-				selectedSelectNode = null;
 			}
 			else
 			{
@@ -82,14 +77,13 @@ package drop.system
 
 					selectNode.selectComponent.isSelected = true;
 					selectNode.stateComponent.stateMachine.changeState("selected");
-
-					selectedSelectNode = selectNode;
 				}
 			}
 		}
 
 		private function handleInputMove(selectNode : SelectNode) : void
 		{
+			var selectedSelectNode : SelectNode = getSelectedNode();
 			if (selectedSelectNode != null &&
 					Math.abs(selectedSelectNode.transformComponent.x - selectNode.transformComponent.x) +
 					Math.abs(selectedSelectNode.transformComponent.y - selectNode.transformComponent.y) == tileSize)
@@ -99,6 +93,18 @@ package drop.system
 
 				gameState.shouldStartSwap = true;
 			}
+		}
+
+		private function getSelectedNode() : SelectNode
+		{
+			for (var selectNode : SelectNode = selectNodeList.head; selectNode; selectNode = selectNode.next)
+			{
+				if (selectNode.selectComponent.isSelected)
+				{
+					return selectNode;
+				}
+			}
+			return null;
 		}
 
 		private function getSelectNodeForInput(input : Input) : SelectNode

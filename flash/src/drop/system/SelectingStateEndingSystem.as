@@ -8,12 +8,12 @@ package drop.system
 
 	public class SelectingStateEndingSystem extends System
 	{
-		private var engineStateMachine : EngineStateMachine;
+		private var stateMachine : EngineStateMachine;
 		private var gameState : GameState;
 
-		public function SelectingStateEndingSystem(engineStateMachine : EngineStateMachine, gameState : GameState)
+		public function SelectingStateEndingSystem(stateMachine : EngineStateMachine, gameState : GameState)
 		{
-			this.engineStateMachine = engineStateMachine;
+			this.stateMachine = stateMachine;
 			this.gameState = gameState;
 		}
 
@@ -27,7 +27,7 @@ package drop.system
 			if (gameState.shouldStartSwap)
 			{
 				gameState.isTryingSwap = true;
-				engineStateMachine.changeState("swapping");
+				stateMachine.changeState("swapping");
 			}
 		}
 	}

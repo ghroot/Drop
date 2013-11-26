@@ -15,14 +15,11 @@ package drop.system
 		private var gameState : GameState;
 
 		private var matchNodeList : NodeList;
-		private var matchNodes : Vector.<MatchNode>;
 
 		public function MatchingSystem(matcher : Matcher, gameState : GameState)
 		{
 			this.matcher = matcher;
 			this.gameState = gameState;
-
-			matchNodes = new Vector.<MatchNode>();
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -32,16 +29,10 @@ package drop.system
 
 		override public function update(time : Number) : void
 		{
-			matchNodes.length = 0;
-			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
-			{
-				matchNodes[matchNodes.length] = matchNode;
-			}
-
-			var matches : Vector.<Match> = matcher.getMatches(matchNodes);
+			var matches : Vector.<Match> = matcher.getMatches(matchNodeList);
 			for each (var match : Match in matches)
 			{
-				for each (matchNode in match.matchNodes)
+				for each (var matchNode : MatchNode in match.matchNodes)
 				{
 					matchNode.stateComponent.stateMachine.changeState("matched");
 				}
