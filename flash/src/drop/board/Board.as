@@ -18,6 +18,7 @@ package drop.board
 	import drop.system.MatchingStateEndingSystem;
 	import drop.system.MatchingSystem;
 	import drop.system.MoveSystem;
+	import drop.system.ScriptSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
@@ -130,8 +131,9 @@ package drop.board
 			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
+			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new HudDisplaySystem(textField, gameState), SystemPriorities.DISPLAY);
-			engine.addSystem(new DisplaySystem(boardContainer), SystemPriorities.DISPLAY);
+			engine.addSystem(new DisplaySystem(boardContainer, tileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");
 

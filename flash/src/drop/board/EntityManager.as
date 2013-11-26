@@ -21,6 +21,10 @@ package drop.board
 	import drop.component.SpawnerComponent;
 	import drop.component.StateComponent;
 	import drop.component.TransformComponent;
+	import drop.component.script.MatchedAnimationScript;
+	import drop.component.script.ScaleScript;
+	import drop.component.script.ScriptComponent;
+	import drop.util.DisplayUtils;
 
 	import flash.geom.Point;
 
@@ -54,29 +58,35 @@ package drop.board
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
 			var color : int = colors[Math.floor(Math.random() * colors.length)];
+			var quad : Quad = new Quad(tileSize, tileSize, color);
+			DisplayUtils.centerPivot(quad);
+			quad.touchable = false;
+
+			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
+			var selectComponent : SelectComponent = SelectComponent.create();
+			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(quad);
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
-			var idleQuad : Quad = new Quad(tileSize, tileSize, color);
-			idleQuad.touchable = false;
-			idleState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(idleQuad));
+			idleState.add(SelectComponent).withInstance(selectComponent);
+			idleState.add(DisplayComponent).withInstance(displayComponent);
 
 			var selectedState : EntityState = stateMachine.createState("selected");
-			var selectedQuad : Quad = new Quad(tileSize - 10, tileSize - 10, color);
-			selectedQuad.pivotX = selectedQuad.pivotY = -5;
-			selectedQuad.touchable = false;
-			selectedState.add(DisplayComponent).withInstance(DisplayComponent.create().withDisplayObject(selectedQuad));
+			selectedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0.75)));
+			selectedState.add(SelectComponent).withInstance(selectComponent);
+			selectedState.add(DisplayComponent).withInstance(displayComponent);
 
 			var matchedState : EntityState = stateMachine.createState("matched");
-			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create());
+			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new MatchedAnimationScript(transformComponent)));
+			matchedState.add(DisplayComponent).withInstance(displayComponent);
+			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.4));
 
 			var destroyedByLineBlastState : EntityState = stateMachine.createState("destroyedByLineBlast");
 			destroyedByLineBlastState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.6));
 
-			entity.add(TransformComponent.create().withX(x).withY(y));
+			entity.add(transformComponent);
 			entity.add(BlockComponent.create());
 			entity.add(MoveComponent.create());
-			entity.add(SelectComponent.create());
 			entity.add(MatchComponent.create().withColor(color));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
