@@ -4,33 +4,27 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
-	import drop.board.Matcher;
-	import drop.node.MatchNode;
+	import drop.data.GameState;
 	import drop.node.SelectNode;
+
+	import starling.animation.Tween;
 
 	public class SwapSystem extends System
 	{
-		private var matcher : Matcher;
+		private var gameState : GameState;
 
-		private var selectNodeList : NodeList;
-		private var matchNodeList : NodeList;
-		private var matchNodes : Vector.<MatchNode>;
+		private var tween1 : Tween;
+		private var tween2 : Tween;
 
-		public function SwapSystem(matcher : Matcher)
+		public function SwapSystem(gameState : GameState)
 		{
-			this.matcher = matcher;
-
-			matchNodes = new Vector.<MatchNode>();
+			this.gameState = gameState;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			selectNodeList = engine.getNodeList(SelectNode);
-			matchNodeList = engine.getNodeList(MatchNode);
-		}
+			var selectNodeList : NodeList = engine.getNodeList(SelectNode);
 
-		override public function update(time : Number) : void
-		{
 			var selectedSelectNode : SelectNode = null;
 			for (var selectNode : SelectNode = selectNodeList.head; selectNode; selectNode = selectNode.next)
 			{
@@ -42,12 +36,15 @@ package drop.system
 					}
 					else
 					{
-						swap(selectedSelectNode, selectNode);
+						tween1 = new Tween(selectNode.transformComponent, 0.2);
+						tween1.animate("x", selectedSelectNode.transformComponent.x);
+						tween1.animate("y", selectedSelectNode.transformComponent.y);
 
-						if (hasNoMatches())
-						{
-							swap(selectedSelectNode, selectNode);
-						}
+						tween2 = new Tween(selectedSelectNode.transformComponent, 0.2);
+						tween2.animate("x", selectNode.transformComponent.x);
+						tween2.animate("y", selectNode.transformComponent.y);
+
+						gameState.swapInProgress = true;
 
 						break;
 					}
@@ -55,24 +52,17 @@ package drop.system
 			}
 		}
 
-		private function swap(selectNode1 : SelectNode, selectNode2 : SelectNode) : void
+		override public function update(time : Number) : void
 		{
-			var tempPositionX : Number = selectNode1.transformComponent.x;
-			var tempPositionY : Number = selectNode1.transformComponent.y;
-			selectNode1.transformComponent.x = selectNode2.transformComponent.x;
-			selectNode1.transformComponent.y = selectNode2.transformComponent.y;
-			selectNode2.transformComponent.x = tempPositionX;
-			selectNode2.transformComponent.y = tempPositionY;
-		}
+			tween1.advanceTime(time);
+			tween2.advanceTime(time);
 
-		private function hasNoMatches() : Boolean
-		{
-			matchNodes.length = 0;
-			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
+			if (gameState.swapInProgress &&
+					tween1.isComplete &&
+					tween2.isComplete)
 			{
-				matchNodes[matchNodes.length] = matchNode;
+				gameState.swapInProgress = false;
 			}
-			return !matcher.hasMatches(matchNodes);
 		}
 	}
 }

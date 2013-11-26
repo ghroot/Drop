@@ -19,14 +19,15 @@ package drop.system
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			gameState.shouldSubmit = false;
+			gameState.shouldStartSwap = false;
 		}
 
 		override public function update(time : Number) : void
 		{
-			if (gameState.shouldSubmit)
+			if (gameState.shouldStartSwap)
 			{
-				engineStateMachine.changeState("submitting");
+				gameState.isTryingSwap = true;
+				engineStateMachine.changeState("swapping");
 			}
 		}
 	}

@@ -10,7 +10,6 @@ package drop.board
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
 	import drop.system.CountdownSystem;
-	import drop.system.DeselectSystem;
 	import drop.system.DisplaySystem;
 	import drop.system.FlySystem;
 	import drop.system.HudDisplaySystem;
@@ -22,20 +21,18 @@ package drop.board
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
-	import drop.system.SubmittingStateEndingSystem;
 	import drop.system.SwapSystem;
+	import drop.system.SwappingStateEndingSystem;
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 
 	import flash.geom.Point;
 
 	import starling.core.Starling;
-	import starling.display.Image;
 	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.text.BitmapFont;
 	import starling.text.TextField;
-	import starling.textures.Texture;
 	import starling.textures.Texture;
 	import starling.utils.AssetManager;
 	import starling.utils.HAlign;
@@ -115,10 +112,9 @@ package drop.board
 			selectingState.addInstance(new SelectControlSystem(gameState, tileSize)).withPriority(SystemPriorities.CONTROL);
 			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
-			var submittingState : EngineState = stateMachine.createState("submitting");
-			submittingState.addInstance(new SwapSystem(matcher)).withPriority(SystemPriorities.LOGIC);
-			submittingState.addInstance(new DeselectSystem()).withPriority(SystemPriorities.POST_LOGIC);
-			submittingState.addInstance(new SubmittingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
+			var swappingState : EngineState = stateMachine.createState("swapping");
+			swappingState.addInstance(new SwapSystem(gameState)).withPriority(SystemPriorities.LOGIC);
+			swappingState.addInstance(new SwappingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var matchingState : EngineState = stateMachine.createState("matching");
 			matchingState.addInstance(new MatchingSystem(matcher, gameState)).withPriority(SystemPriorities.LOGIC);

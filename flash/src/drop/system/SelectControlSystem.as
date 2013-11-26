@@ -30,7 +30,7 @@ package drop.system
 		{
 			selectNodeList = engine.getNodeList(SelectNode);
 
-			gameState.shouldSubmit = false;
+			gameState.shouldStartSwap = false;
 			selectedSelectNode = null;
 		}
 
@@ -73,7 +73,7 @@ package drop.system
 					selectNode.selectComponent.isSelected = true;
 					selectNode.stateComponent.stateMachine.changeState("selected");
 
-					gameState.shouldSubmit = true;
+					gameState.shouldStartSwap = true;
 				}
 				else
 				{
@@ -97,7 +97,7 @@ package drop.system
 				selectNode.selectComponent.isSelected = true;
 				selectNode.stateComponent.stateMachine.changeState("selected");
 
-				gameState.shouldSubmit = true;
+				gameState.shouldStartSwap = true;
 			}
 		}
 

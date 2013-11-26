@@ -4,7 +4,12 @@ package drop.data
 	{
 		public var credits : int;
 		public var inputs : Vector.<Input>;
-		public var shouldSubmit : Boolean;
+
+		public var shouldStartSwap : Boolean;
+		public var swapInProgress : Boolean;
+		public var isTryingSwap : Boolean;
+		public var isSwappingBack : Boolean;
+
 		public var atLeastOneMatch : Boolean;
 
 		public function GameState()

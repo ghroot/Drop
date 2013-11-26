@@ -9,14 +9,14 @@ package drop.system
 	import drop.node.SelectNode;
 	import drop.node.SelectNodeUtils;
 
-	public class MatchingStateEndingSystem extends System
+	public class SwappingStateEndingSystem extends System
 	{
 		private var stateMachine : EngineStateMachine;
 		private var gameState : GameState;
 
 		private var selectNodeList : NodeList;
 
-		public function MatchingStateEndingSystem(stateMachine : EngineStateMachine, gameState : GameState)
+		public function SwappingStateEndingSystem(stateMachine : EngineStateMachine, gameState : GameState)
 		{
 			this.stateMachine = stateMachine;
 			this.gameState = gameState;
@@ -29,20 +29,18 @@ package drop.system
 
 		override public function update(time : Number) : void
 		{
-			if (gameState.atLeastOneMatch)
+			if (!gameState.swapInProgress)
 			{
-				SelectNodeUtils.deselectSelectNodes(selectNodeList);
-				stateMachine.changeState("cascading");
-			}
-			else if (gameState.isTryingSwap)
-			{
-				gameState.isTryingSwap = false;
-				gameState.isSwappingBack = true;
-				stateMachine.changeState("swapping");
-			}
-			else
-			{
-				stateMachine.changeState("selecting");
+				if (gameState.isSwappingBack)
+				{
+					SelectNodeUtils.deselectSelectNodes(selectNodeList);
+					gameState.isSwappingBack = false;
+					stateMachine.changeState("selecting");
+				}
+				else
+				{
+					stateMachine.changeState("matching");
+				}
 			}
 		}
 	}
