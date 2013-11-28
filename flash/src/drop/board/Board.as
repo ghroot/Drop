@@ -7,6 +7,7 @@ package drop.board
 	import ash.tick.ITickProvider;
 
 	import drop.data.GameState;
+	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
 	import drop.system.CountdownSystem;
@@ -25,6 +26,7 @@ package drop.board
 	import drop.system.SwappingStateEndingSystem;
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
+	import drop.system.TurnEndStateEndingSystem;
 
 	import flash.geom.Point;
 
@@ -45,13 +47,40 @@ package drop.board
 		[Embed(source="../../../res/font.fnt", mimeType="application/octet-stream")]
 		public const FontXml : Class;
 
+		[Embed(source="../../../res/fontSmall.png")]
+		public const FontSmallBitmap : Class;
+
+		[Embed(source="../../../res/fontSmall.fnt", mimeType="application/octet-stream")]
+		public const FontSmallXml : Class;
+
+		[Embed(source="../../../res/font-hd.png")]
+		public const FontHdBitmap : Class;
+
+		[Embed(source="../../../res/font-hd.fnt", mimeType="application/octet-stream")]
+		public const FontHdXml : Class;
+
+		[Embed(source="../../../res/fontSmall-hd.png")]
+		public const FontSmallHdBitmap : Class;
+
+		[Embed(source="../../../res/fontSmall-hd.fnt", mimeType="application/octet-stream")]
+		public const FontSmallHdXml : Class;
+
 		public function Board()
 		{
 		}
 
 		public function start(scaleFactor : Number) : void
 		{
-			TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontBitmap()), XML(new FontXml())), "Quicksand");
+			if (scaleFactor == 1)
+			{
+				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontBitmap()), XML(new FontXml())), "Quicksand");
+				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontSmallBitmap()), XML(new FontSmallXml())), "QuicksandSmall");
+			}
+			else
+			{
+				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontHdBitmap()), XML(new FontHdXml())), "Quicksand");
+				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontSmallHdBitmap()), XML(new FontSmallHdXml())), "QuicksandSmall");
+			}
 
 			var boardSize : Point = new Point(7, 7);
 			var modelTileSize : int = 44;
@@ -67,11 +96,16 @@ package drop.board
 			addChild(boardContainer);
 
 			var textField : TextField = new TextField(stage.stageWidth, stage.stageHeight - boardSize.y * viewTileSize, "0", "Quicksand", 60 * scaleFactor);
-			textField.name = "textField";
 			textField.hAlign = HAlign.CENTER;
 			textField.vAlign = VAlign.CENTER;
 			textField.y = boardSize.y * viewTileSize;
 			addChild(textField);
+
+			var statusTextField : TextField = new TextField(stage.stageWidth, 30 * scaleFactor, "", "QuicksandSmall", 20 * scaleFactor);
+			statusTextField.hAlign = HAlign.CENTER;
+			statusTextField.vAlign = VAlign.TOP;
+			statusTextField.y = textField.y + int(textField.height / 2) + 24 * scaleFactor;
+			addChild(statusTextField);
 
 			var gameState : GameState = new GameState();
 
@@ -124,11 +158,15 @@ package drop.board
 			cascadingState.addInstance(new MoveSystem(boardSize, modelTileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
+			var turnEndState : EngineState = stateMachine.createState("turnEnd");
+			turnEndState.addInstance(new AddPendingCreditsSystem(gameState)).withPriority(SystemPriorities.LOGIC);
+			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
+
 			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(textField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(textField, statusTextField, gameState), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(boardContainer, scaleFactor, viewTileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");

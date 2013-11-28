@@ -3,6 +3,7 @@ package drop.data
 	public class GameState
 	{
 		public var credits : int;
+		public var pendingCredits : int;
 		public var inputs : Vector.<Input>;
 
 		public var shouldStartSwap : Boolean;

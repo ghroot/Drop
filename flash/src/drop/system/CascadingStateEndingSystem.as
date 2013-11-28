@@ -8,14 +8,14 @@ package drop.system
 
 	public class CascadingStateEndingSystem extends System
 	{
-		private var engineStateMachine : EngineStateMachine;
+		private var stateMachine : EngineStateMachine;
 
 		private var countdownNodeList : NodeList;
 		private var moveNodeList : NodeList;
 
 		public function CascadingStateEndingSystem(engineStateMachine : EngineStateMachine)
 		{
-			this.engineStateMachine = engineStateMachine;
+			this.stateMachine = engineStateMachine;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -28,7 +28,7 @@ package drop.system
 		{
 			if (hasBoardSettled())
 			{
-				engineStateMachine.changeState("matching");
+				stateMachine.changeState("matching");
 			}
 		}
 

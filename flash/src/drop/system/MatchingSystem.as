@@ -46,7 +46,7 @@ package drop.system
 				{
 					creditsToAdd *= 2;
 				}
-				gameState.credits += creditsToAdd;
+				gameState.pendingCredits += creditsToAdd;
 			}
 
 			gameState.atLeastOneMatch = matches.length > 0;

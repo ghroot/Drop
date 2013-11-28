@@ -64,7 +64,7 @@ package drop.system
 						{
 							lineBlastTargetNode.stateComponent.stateMachine.changeState("destroyedByLineBlast");
 
-							gameState.credits++;
+							gameState.pendingCredits++;
 						}
 					}
 

@@ -32,6 +32,7 @@ package drop.system
 			if (gameState.atLeastOneMatch)
 			{
 				SelectNodeUtils.deselectSelectNodes(selectNodeList);
+				gameState.isTryingSwap = false;
 				stateMachine.changeState("cascading");
 			}
 			else if (gameState.isTryingSwap)
@@ -42,7 +43,7 @@ package drop.system
 			}
 			else
 			{
-				stateMachine.changeState("selecting");
+				stateMachine.changeState("turnEnd");
 			}
 		}
 	}
