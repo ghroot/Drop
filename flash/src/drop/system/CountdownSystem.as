@@ -3,6 +3,7 @@ package drop.system
 	import ash.core.*;
 
 	import drop.board.EntityManager;
+	import drop.component.StateComponent;
 	import drop.data.Countdown;
 	import drop.node.CountdownNode;
 
@@ -57,7 +58,8 @@ package drop.system
 				{
 					if (countdownNode.countdownComponent.stateToChangeTo != null)
 					{
-						countdownNode.stateComponent.stateMachine.changeState(countdownNode.countdownComponent.stateToChangeTo);
+						var stateComponent : StateComponent = countdownNode.entity.get(StateComponent);
+						stateComponent.stateMachine.changeState(countdownNode.countdownComponent.stateToChangeTo);
 					}
 					else
 					{

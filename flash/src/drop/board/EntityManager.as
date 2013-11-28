@@ -8,12 +8,9 @@ package drop.board
 	import ash.tools.ComponentPool;
 
 	import drop.component.BlockComponent;
-	import drop.component.BoundsComponent;
 	import drop.component.CountdownComponent;
 	import drop.component.DisplayComponent;
-	import drop.component.FlyComponent;
 	import drop.component.LineBlastComponent;
-	import drop.component.LineBlastPulseComponent;
 	import drop.component.LineBlastTargetComponent;
 	import drop.component.MatchComponent;
 	import drop.component.MoveComponent;
@@ -23,9 +20,12 @@ package drop.board
 	import drop.component.TransformComponent;
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
+	import drop.component.script.TweenScript;
 	import drop.util.DisplayUtils;
 
 	import flash.geom.Point;
+
+	import starling.animation.Tween;
 
 	import starling.display.Quad;
 	import starling.display.Sprite;
@@ -139,9 +139,6 @@ package drop.board
 			var triggeredState : EntityState = stateMachine.createState("triggered");
 			triggeredState.add(LineBlastComponent).withInstance(triggeredLineBlastComponent);
 
-			var detonatedState : EntityState = stateMachine.createState("detonated");
-			detonatedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.6));
-
 			var destroyedByLineBlastState : EntityState = stateMachine.createState("destroyedByLineBlast");
 			destroyedByLineBlastState.add(CountdownComponent).withInstance(CountdownComponent.create().withStateToChangeTo("triggered"));
 
@@ -156,56 +153,42 @@ package drop.board
 			return entity;
 		}
 
-		public function createLineBlastPulse(x : Number, y : Number, blastDirectionX : int, blastDirectionY : int) : Entity
+		public function createLineBlastPulse(x : Number, y : Number, color : int) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			var quad : Quad = new Quad(viewTileSize / 3, viewTileSize / 3, 0x000000);
-			DisplayUtils.centerPivot(quad);
-			quad.touchable = false;
-			entity.add(DisplayComponent.create().withDisplayObject(quad));
+			var horizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, viewTileSize / 6, color);
+			horizontalQuad.pivotX = (x / modelTileSize * viewTileSize) + viewTileSize / 2;
+			DisplayUtils.centerPivotY(horizontalQuad);
+			var verticalQuad : Quad = new Quad(viewTileSize / 6, boardSize.y * viewTileSize, color);
+			DisplayUtils.centerPivotX(verticalQuad);
+			verticalQuad.pivotY = (y / modelTileSize * viewTileSize) + viewTileSize / 2;
+			var sprite : Sprite = new Sprite();
+			sprite.addChild(horizontalQuad);
+			sprite.addChild(verticalQuad);
+			entity.add(DisplayComponent.create().withDisplayObject(sprite));
 
-			entity.add(FlyComponent.create().withVelocityX(extend(blastDirectionX, 8)).withVelocityY(extend(blastDirectionY, 8)));
-			entity.add(BoundsComponent.create().withWidth(boardSize.x * modelTileSize).withHeight(boardSize.y * modelTileSize));
-			entity.add(TransformComponent.create().withX(x + cap(blastDirectionX, 30)).withY(y + cap(blastDirectionY, 30)));
-			entity.add(LineBlastPulseComponent.create());
+			var horizontalTween : Tween = new Tween(horizontalQuad, 0.1);
+			horizontalTween.animate("scaleY", 0.3);
+			horizontalTween.repeatCount = int.MAX_VALUE;
+			horizontalTween.reverse = true;
+			var verticalTween : Tween = new Tween(verticalQuad, 0.1);
+			verticalTween.animate("scaleX", 0.3);
+			verticalTween.repeatCount = int.MAX_VALUE;
+			verticalTween.reverse = true;
+			entity.add(ScriptComponent.create().withScript(new TweenScript(horizontalTween)).withScript(new TweenScript(verticalTween)));
+
+			entity.add(CountdownComponent.create().withTime(0.6));
+			entity.add(TransformComponent.create().withX(x).withY(y));
 
 			return entity;
-		}
-
-		private function cap(value : Number, cap : Number) : Number
-		{
-			if (value < 0)
-			{
-				return Math.max(value, -cap);
-			}
-			else
-			{
-				return Math.min(value, cap);
-			}
-		}
-
-		private function extend(value : Number, length : Number) : Number
-		{
-			if (value < 0)
-			{
-				return -length;
-			}
-			else if (value > 0)
-			{
-				return length;
-			}
-			else
-			{
-				return 0;
-			}
 		}
 
 		public function createSpawner(x : Number, y : Number) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(new SpawnerComponent());
+			entity.add(SpawnerComponent.create());
 			entity.add(TransformComponent.create().withX(x).withY(y));
 
 			return entity;
@@ -215,7 +198,20 @@ package drop.board
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(new BlockComponent());
+			entity.add(BlockComponent.create());
+			entity.add(TransformComponent.create().withX(x).withY(y));
+
+			return entity;
+		}
+
+		public function createInvisibleBlocker(x : Number, y : Number, duration : Number) : Entity
+		{
+			var entity : Entity = new Entity();
+
+			entity.name = "invisibleBlocker" + Math.random();
+
+			entity.add(BlockComponent.create());
+			entity.add(CountdownComponent.create().withTime(duration));
 			entity.add(TransformComponent.create().withX(x).withY(y));
 
 			return entity;

@@ -35,7 +35,7 @@ package drop.system
 		private function hasBoardSettled() : Boolean
 		{
 			return areAllMoveNodesStill() &&
-					noCountdowNodesAreActive();
+					noCountdownNodesAreActive();
 		}
 
 		private function areAllMoveNodesStill() : Boolean
@@ -51,9 +51,9 @@ package drop.system
 			return true;
 		}
 
-		private function noCountdowNodesAreActive() : Boolean
+		private function noCountdownNodesAreActive() : Boolean
 		{
-			return countdownNodeList.head == null;
+			return countdownNodeList.empty;
 		}
 	}
 }

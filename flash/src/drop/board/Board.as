@@ -14,7 +14,6 @@ package drop.board
 	import drop.system.FlySystem;
 	import drop.system.HudDisplaySystem;
 	import drop.system.LineBlastDetonationSystem;
-	import drop.system.LineBlastPulseSystem;
 	import drop.system.MatchingStateEndingSystem;
 	import drop.system.MatchingSystem;
 	import drop.system.MoveSystem;
@@ -120,8 +119,7 @@ package drop.board
 			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
-			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager)).withPriority(SystemPriorities.LOGIC);
-			cascadingState.addInstance(new LineBlastPulseSystem(modelTileSize)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager, boardSize, modelTileSize, gameState)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new SpawnerSystem(modelTileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new MoveSystem(boardSize, modelTileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
