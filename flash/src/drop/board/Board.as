@@ -77,7 +77,7 @@ package drop.board
 
 			var engine : Engine = new Engine();
 
-			var entityManager : EntityManager = new EntityManager(engine, boardSize, modelTileSize, viewTileSize);
+			var entityManager : EntityManager = new EntityManager(engine, boardSize, modelTileSize, viewTileSize, scaleFactor);
 
 			var matcher : Matcher = new Matcher(boardSize, modelTileSize);
 

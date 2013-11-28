@@ -1,22 +1,23 @@
 package drop.component.script
 {
+	import drop.component.DisplayComponent;
 	import drop.component.TransformComponent;
 
 	import starling.animation.Tween;
 
-	public class ScaleScript extends Script
+	public class AlphaScript extends Script
 	{
-		private var transformComponent : TransformComponent;
-		private var scale : Number;
+		private var displayComponent : DisplayComponent;
+		private var alpha : Number;
 		private var tweenDuration : Number;
 		private var resetOnEnd : Boolean;
 
 		private var tween : Tween;
 
-		public function ScaleScript(transformComponent : TransformComponent, scale : Number, tweenDuration : Number = 0, resetOnEnd : Boolean = false)
+		public function AlphaScript(displayComponent : DisplayComponent, alpha : Number, tweenDuration : Number = 0, resetOnEnd : Boolean = false)
 		{
-			this.transformComponent = transformComponent;
-			this.scale = scale;
+			this.displayComponent = displayComponent;
+			this.alpha = alpha;
 			this.tweenDuration = tweenDuration;
 			this.resetOnEnd = resetOnEnd;
 		}
@@ -25,12 +26,12 @@ package drop.component.script
 		{
 			if (tweenDuration == 0)
 			{
-				transformComponent.scale = scale;
+				displayComponent.displayObject.alpha = alpha;
 			}
 			else
 			{
-				tween = new Tween(transformComponent, tweenDuration);
-				tween.animate("scale", scale);
+				tween = new Tween(displayComponent.displayObject, tweenDuration);
+				tween.animate("alpha", alpha);
 			}
 		}
 
@@ -46,7 +47,7 @@ package drop.component.script
 		{
 			if (resetOnEnd)
 			{
-				transformComponent.scale = 1;
+				displayComponent.displayObject.alpha = 1;
 			}
 			tween = null;
 		}

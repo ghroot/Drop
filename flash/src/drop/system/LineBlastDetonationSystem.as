@@ -75,7 +75,7 @@ package drop.system
 							if (positionX == lineBlastNode.transformComponent.x ||
 									positionY == lineBlastNode.transformComponent.y)
 							{
-								engine.addEntity(entityManager.createInvisibleBlocker(positionX, positionY, 0.6));
+								engine.addEntity(entityManager.createInvisibleBlocker(positionX, positionY, 0.5));
 							}
 						}
 					}
