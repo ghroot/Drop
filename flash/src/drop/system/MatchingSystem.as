@@ -7,6 +7,7 @@ package drop.system
 	import drop.board.Match;
 	import drop.board.Matcher;
 	import drop.data.GameState;
+	import drop.data.MatchPatterns;
 	import drop.node.MatchNode;
 
 	public class MatchingSystem extends System
@@ -46,7 +47,10 @@ package drop.system
 				{
 					creditsToAdd *= 2;
 				}
+				creditsToAdd += gameState.matchPatternLevels[MatchPatterns.getFromMatch(match)].getLevel();
 				gameState.pendingCredits += creditsToAdd;
+
+				gameState.matchPatternLevels[MatchPatterns.getFromMatch(match)].points++;
 			}
 
 			gameState.atLeastOneMatch = matches.length > 0;
