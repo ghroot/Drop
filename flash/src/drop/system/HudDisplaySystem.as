@@ -16,6 +16,7 @@ package drop.system
 		private var currentCredits : int;
 		private var currentPendingCredits : int;
 		private var tween : Tween;
+		private var statusTween : Tween;
 
 		public function HudDisplaySystem(textField : TextField, statusTextField : TextField, gameState : GameState)
 		{
@@ -45,7 +46,16 @@ package drop.system
 			{
 				if (gameState.pendingCredits == 0)
 				{
-					statusTextField.text = "";
+					const originalY : Number = statusTextField.y;
+					statusTween = new Tween(statusTextField, 0.3);
+					statusTween.animate("y", originalY - 10);
+					statusTween.animate("alpha", 0);
+					statusTween.onComplete = function() : void
+					{
+						statusTextField.y = originalY;
+						statusTextField.alpha = 1;
+						statusTextField.text = "";
+					}
 				}
 				else
 				{
@@ -67,6 +77,14 @@ package drop.system
 				if (tween.isComplete)
 				{
 					tween = null;
+				}
+			}
+			if (statusTween != null)
+			{
+				statusTween.advanceTime(time);
+				if (statusTween.isComplete)
+				{
+					statusTween = null;
 				}
 			}
 		}
