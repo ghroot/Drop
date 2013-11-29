@@ -7,12 +7,12 @@ package drop.board
 	import ash.tick.ITickProvider;
 
 	import drop.data.GameState;
+
 	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
-	import drop.system.FlySystem;
 	import drop.system.HudDisplaySystem;
 	import drop.system.LineBlastDetonationSystem;
 	import drop.system.MatchingStateEndingSystem;
@@ -28,63 +28,53 @@ package drop.board
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
 
+	import feathers.controls.Button;
+	import feathers.controls.LayoutGroup;
+	import feathers.controls.Screen;
+	import feathers.layout.AnchorLayout;
+	import feathers.layout.AnchorLayoutData;
+
 	import flash.geom.Point;
+
+	import org.osflash.signals.Signal;
 
 	import starling.core.Starling;
 	import starling.display.Quad;
 	import starling.display.Sprite;
-	import starling.text.BitmapFont;
+
+	import starling.events.Event;
 	import starling.text.TextField;
-	import starling.textures.Texture;
 	import starling.utils.HAlign;
 	import starling.utils.VAlign;
 
-	public class Board extends Sprite
+	public class BoardScreen extends Screen
 	{
-		[Embed(source="../../../res/font.png")]
-		public const FontBitmap : Class;
+		private var scaleFactor : Number;
+		private var sharedState : Object;
 
-		[Embed(source="../../../res/font.fnt", mimeType="application/octet-stream")]
-		public const FontXml : Class;
+		public var onStats : Signal = new Signal(BoardScreen);
 
-		[Embed(source="../../../res/fontSmall.png")]
-		public const FontSmallBitmap : Class;
+		private var gameState : GameState;
 
-		[Embed(source="../../../res/fontSmall.fnt", mimeType="application/octet-stream")]
-		public const FontSmallXml : Class;
-
-		[Embed(source="../../../res/font-hd.png")]
-		public const FontHdBitmap : Class;
-
-		[Embed(source="../../../res/font-hd.fnt", mimeType="application/octet-stream")]
-		public const FontHdXml : Class;
-
-		[Embed(source="../../../res/fontSmall-hd.png")]
-		public const FontSmallHdBitmap : Class;
-
-		[Embed(source="../../../res/fontSmall-hd.fnt", mimeType="application/octet-stream")]
-		public const FontSmallHdXml : Class;
-
-		public function Board()
+		public function BoardScreen(scaleFactor : Number, sharedState : Object)
 		{
+			this.scaleFactor = scaleFactor;
+			this.sharedState = sharedState;
+
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
 
-		public function start(scaleFactor : Number) : void
+		private function onAddedToStage(event : Event) : void
 		{
-			if (scaleFactor == 1)
-			{
-				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontBitmap()), XML(new FontXml())), "Quicksand");
-				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontSmallBitmap()), XML(new FontSmallXml())), "QuicksandSmall");
-			}
-			else
-			{
-				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontHdBitmap()), XML(new FontHdXml())), "Quicksand");
-				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontSmallHdBitmap()), XML(new FontSmallHdXml())), "QuicksandSmall");
-			}
+			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
 			var boardSize : Point = new Point(7, 7);
 			var modelTileSize : int = 44;
 			var viewTileSize : int = modelTileSize * scaleFactor;
+
+			var backgroundQuad : Quad = new Quad(stage.stageWidth, stage.stageHeight, 0xffffff);
+			backgroundQuad.touchable = false;
+			addChild(backgroundQuad);
 
 			var touchQuad : Quad = new Quad(boardSize.x * viewTileSize, boardSize.y * viewTileSize, 0xffffff);
 			touchQuad.x = touchQuad.y = (stage.stageWidth - boardSize.x * viewTileSize) / 2;
@@ -107,7 +97,22 @@ package drop.board
 			statusTextField.y = textField.y + int(textField.height / 2) + 24 * scaleFactor;
 			addChild(statusTextField);
 
-			var gameState : GameState = new GameState();
+			var group : LayoutGroup = new LayoutGroup();
+			group.setSize(stage.stageWidth, stage.stageHeight);
+			group.layout = new AnchorLayout();
+			addChild(group);
+
+			var statsButton : Button = new Button();
+			statsButton.label = "Stats";
+			statsButton.addEventListener(Event.TRIGGERED, onStatusButtonTriggered);
+			group.addChild(statsButton);
+
+			var layoutData : AnchorLayoutData = new AnchorLayoutData();
+			layoutData.right = 2;
+			layoutData.bottom = 2;
+			statsButton.layoutData = layoutData;
+
+			gameState = new GameState();
 
 			var engine : Engine = new Engine();
 
@@ -162,7 +167,6 @@ package drop.board
 			turnEndState.addInstance(new AddPendingCreditsSystem(gameState)).withPriority(SystemPriorities.LOGIC);
 			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
-			engine.addSystem(new FlySystem(), SystemPriorities.LOGIC);
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
@@ -173,7 +177,18 @@ package drop.board
 
 			var tickProvider : ITickProvider = new StarlingFixedTickProvider(Starling.juggler, 0.017);
 			tickProvider.add(engine.update);
+			tickProvider.add(updateSharedState);
 			tickProvider.start();
+		}
+
+		private function updateSharedState(time : Number) : void
+		{
+			sharedState["matchPatternLevels"] = gameState.matchPatternLevels;
+		}
+
+		private function onStatusButtonTriggered(event : Event) : void
+		{
+			onStats.dispatch(this);
 		}
 	}
 }

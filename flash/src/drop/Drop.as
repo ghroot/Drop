@@ -1,6 +1,6 @@
 package drop
 {
-	import drop.board.Board;
+	import drop.Root;
 
 	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
@@ -43,7 +43,7 @@ package drop
 			startupBitmap.y = (stage.fullScreenHeight - startupBitmap.height) / 2;
 			addChild(startupBitmap);
 
-			mStarling = new Starling(Board, stage);
+			mStarling = new Starling(Root, stage);
 			mStarling.simulateMultitouch  = false;
 			mStarling.enableErrorChecking = false;
 			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
@@ -55,7 +55,7 @@ package drop
 				removeChild(startupBitmap);
 				startupBitmap = null;
 
-				var board : Board = mStarling.root as Board;
+				var board : Root = mStarling.root as Root;
 				board.start(scaleFactor);
 				mStarling.start();
 			});
