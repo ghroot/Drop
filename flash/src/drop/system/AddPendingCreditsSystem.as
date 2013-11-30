@@ -15,8 +15,7 @@ package drop.system
 
 		override public function update(time : Number) : void
 		{
-			gameState.credits += gameState.pendingCredits;
-			gameState.pendingCredits = 0;
+			gameState.addPendingCreditsToCredits();
 		}
 	}
 }

@@ -3,90 +3,94 @@ package drop.system
 	import ash.core.System;
 
 	import drop.data.GameState;
+	import drop.data.MatchPatternLevel;
+	import drop.data.MatchPatterns;
 
 	import starling.animation.Tween;
+	import starling.core.Starling;
 	import starling.text.TextField;
 
 	public class HudDisplaySystem extends System
 	{
 		private var gameState : GameState;
-		private var textField : TextField;
-		private var statusTextField : TextField;
+		private var creditsTextField : TextField;
+		private var pendingCreditsTextField : TextField;
+		private var messagesTextField : TextField;
 
-		private var currentCredits : int;
-		private var currentPendingCredits : int;
-		private var tween : Tween;
-		private var statusTween : Tween;
-
-		public function HudDisplaySystem(textField : TextField, statusTextField : TextField, gameState : GameState)
+		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField, messagesTextField : TextField, gameState : GameState)
 		{
-			this.textField = textField;
-			this.statusTextField = statusTextField;
+			this.creditsTextField = creditsTextField;
+			this.pendingCreditsTextField = pendingCreditsTextField;
+			this.messagesTextField = messagesTextField;
 			this.gameState = gameState;
 
-			currentCredits = -1;
+			pendingCreditsTextField.visible = false;
+			messagesTextField.visible = false;
+
+			gameState.creditsUpdated.add(onCreditsUpdated);
+			gameState.pendingCreditsUpdated.add(onPendingCreditsUpdated);
+			gameState.matchPatternLevelUpdated.add(onMatchPatternLevelUpdated);
 		}
 
-		override public function update(time : Number) : void
+		private function onCreditsUpdated(credits : int) : void
 		{
-			if (currentCredits != gameState.credits)
+			var proxy : Object = { "credits": parseInt(creditsTextField.text) };
+			var tween : Tween = new Tween(proxy, 0.2);
+			tween.animate("credits", gameState.credits);
+			tween.onUpdate = function() : void
 			{
-				var proxy : Object = { "credits": currentCredits };
+				creditsTextField.text = int(proxy.credits).toString();
+			};
+			Starling.juggler.add(tween);
+		}
+
+		private function onPendingCreditsUpdated(pendingCredits : int) : void
+		{
+			if (pendingCredits == 0)
+			{
+				const originalY : Number = pendingCreditsTextField.y;
+				var tween : Tween = new Tween(pendingCreditsTextField, 0.3);
+				tween.animate("y", originalY - 10);
+				tween.animate("alpha", 0);
+				tween.onComplete = function() : void
+				{
+					pendingCreditsTextField.text = "0";
+					pendingCreditsTextField.y = originalY;
+					pendingCreditsTextField.alpha = 1;
+					pendingCreditsTextField.visible = false;
+				};
+				Starling.juggler.add(tween);
+			}
+			else
+			{
+				pendingCreditsTextField.visible = true;
+
+				var proxy : Object = { "pendingCredits": parseInt(pendingCreditsTextField.text) };
 				tween = new Tween(proxy, 0.2);
-				tween.animate("credits", gameState.credits);
+				tween.animate("pendingCredits", gameState.pendingCredits);
 				tween.onUpdate = function() : void
 				{
-					textField.text = int(proxy.credits).toString();
+					pendingCreditsTextField.text = "+" + int(proxy.pendingCredits) + " ";
 				};
-
-				currentCredits = gameState.credits;
+				Starling.juggler.add(tween);
 			}
+		}
 
-			if (currentPendingCredits != gameState.pendingCredits)
+		private function onMatchPatternLevelUpdated(matchPatternLevel : MatchPatternLevel) : void
+		{
+			messagesTextField.text = "'" + MatchPatterns.getName(matchPatternLevel.pattern) + "' now at level " + matchPatternLevel.getLevel();
+			messagesTextField.visible = true;
+
+			var messageTween : Tween = new Tween(messagesTextField, 0.5);
+			messageTween.delay = 3;
+			messageTween.animate("alpha", 0);
+			messageTween.onComplete = function() : void
 			{
-				if (gameState.pendingCredits == 0)
-				{
-					const originalY : Number = statusTextField.y;
-					statusTween = new Tween(statusTextField, 0.3);
-					statusTween.animate("y", originalY - 10);
-					statusTween.animate("alpha", 0);
-					statusTween.onComplete = function() : void
-					{
-						statusTextField.y = originalY;
-						statusTextField.alpha = 1;
-						statusTextField.text = "";
-					}
-				}
-				else
-				{
-					proxy = { "pendingCredits": currentPendingCredits };
-					tween = new Tween(proxy, 0.2);
-					tween.animate("pendingCredits", gameState.pendingCredits);
-					tween.onUpdate = function() : void
-					{
-						statusTextField.text = "+" + int(proxy.pendingCredits) + " ";
-					};
-				}
-
-				currentPendingCredits = gameState.pendingCredits;
-			}
-
-			if (tween != null)
-			{
-				tween.advanceTime(time);
-				if (tween.isComplete)
-				{
-					tween = null;
-				}
-			}
-			if (statusTween != null)
-			{
-				statusTween.advanceTime(time);
-				if (statusTween.isComplete)
-				{
-					statusTween = null;
-				}
-			}
+				messagesTextField.visible = false;
+				messagesTextField.alpha = 1;
+				messagesTextField.text = "";
+			};
+			Starling.juggler.add(messageTween);
 		}
 	}
 }

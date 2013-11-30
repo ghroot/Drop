@@ -7,10 +7,10 @@ package drop.board
 	import ash.tick.ITickProvider;
 
 	import drop.data.GameState;
-
 	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
+	import drop.system.ComboSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
 	import drop.system.HudDisplaySystem;
@@ -27,39 +27,25 @@ package drop.board
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
-
-	import feathers.controls.Button;
-	import feathers.controls.LayoutGroup;
-	import feathers.controls.Screen;
-	import feathers.layout.AnchorLayout;
-	import feathers.layout.AnchorLayoutData;
+	import drop.util.DisplayUtils;
 
 	import flash.geom.Point;
-
-	import org.osflash.signals.Signal;
 
 	import starling.core.Starling;
 	import starling.display.Quad;
 	import starling.display.Sprite;
-
 	import starling.events.Event;
 	import starling.text.TextField;
 	import starling.utils.HAlign;
 	import starling.utils.VAlign;
 
-	public class BoardScreen extends Screen
+	public class Board extends Sprite
 	{
 		private var scaleFactor : Number;
-		private var sharedState : Object;
 
-		public var onStats : Signal = new Signal(BoardScreen);
-
-		private var gameState : GameState;
-
-		public function BoardScreen(scaleFactor : Number, sharedState : Object)
+		public function Board(scaleFactor : Number)
 		{
 			this.scaleFactor = scaleFactor;
-			this.sharedState = sharedState;
 
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
@@ -85,34 +71,33 @@ package drop.board
 			boardContainer.touchable = false;
 			addChild(boardContainer);
 
-			var textField : TextField = new TextField(stage.stageWidth, stage.stageHeight - boardSize.y * viewTileSize, "0", "Quicksand", 60 * scaleFactor);
-			textField.hAlign = HAlign.CENTER;
-			textField.vAlign = VAlign.CENTER;
-			textField.y = boardSize.y * viewTileSize;
-			addChild(textField);
+			var overlayContainer : Sprite = new Sprite();
+			overlayContainer.x = boardContainer.x;
+			overlayContainer.touchable = false;
+			addChild(overlayContainer);
 
-			var statusTextField : TextField = new TextField(stage.stageWidth, 30 * scaleFactor, "", "QuicksandSmall", 20 * scaleFactor);
-			statusTextField.hAlign = HAlign.CENTER;
-			statusTextField.vAlign = VAlign.TOP;
-			statusTextField.y = textField.y + int(textField.height / 2) + 24 * scaleFactor;
-			addChild(statusTextField);
+			var creditsTextField : TextField = new TextField(stage.stageWidth, 70 * scaleFactor, "0", "Quicksand", 60 * scaleFactor);
+			creditsTextField.x = stage.stageWidth / 2;
+			creditsTextField.hAlign = HAlign.CENTER;
+			creditsTextField.vAlign = VAlign.CENTER;
+			DisplayUtils.centerPivot(creditsTextField);
+			creditsTextField.y = boardSize.y * viewTileSize + (stage.stageHeight - boardSize.y * viewTileSize) /2;
+			addChild(creditsTextField);
 
-			var group : LayoutGroup = new LayoutGroup();
-			group.setSize(stage.stageWidth, stage.stageHeight);
-			group.layout = new AnchorLayout();
-			addChild(group);
+			var pendingCreditsTextField : TextField = new TextField(stage.stageWidth, 30 * scaleFactor, "0", "QuicksandSmall", 20 * scaleFactor);
+			pendingCreditsTextField.hAlign = HAlign.CENTER;
+			pendingCreditsTextField.vAlign = VAlign.TOP;
+			pendingCreditsTextField.y = creditsTextField.y + creditsTextField.height / 2;
+			addChild(pendingCreditsTextField);
 
-			var statsButton : Button = new Button();
-			statsButton.label = "Stats";
-			statsButton.addEventListener(Event.TRIGGERED, onStatusButtonTriggered);
-			group.addChild(statsButton);
+			var messagesTextField : TextField = new TextField(stage.stageWidth, 30 * scaleFactor, "", "QuicksandSmall", 20 * scaleFactor);
+			messagesTextField.hAlign = HAlign.CENTER;
+			messagesTextField.vAlign = VAlign.BOTTOM;
+			messagesTextField.pivotY = messagesTextField.height;
+			messagesTextField.y = creditsTextField.y - creditsTextField.height / 2;
+			addChild(messagesTextField);
 
-			var layoutData : AnchorLayoutData = new AnchorLayoutData();
-			layoutData.right = 2;
-			layoutData.bottom = 2;
-			statsButton.layoutData = layoutData;
-
-			gameState = new GameState();
+			var gameState : GameState = new GameState();
 
 			var engine : Engine = new Engine();
 
@@ -130,8 +115,7 @@ package drop.board
 					{
 						engine.addEntity(entityManager.createSpawner(x, y));
 					}
-					if ((row == 2 || row == 5) &&
-							(column == 1 || column == 5))
+					if (row == 3 && column == 3)
 					{
 						engine.addEntity(entityManager.createBlocker(x, y));
 					}
@@ -164,31 +148,21 @@ package drop.board
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var turnEndState : EngineState = stateMachine.createState("turnEnd");
+			turnEndState.addInstance(new ComboSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
 			turnEndState.addInstance(new AddPendingCreditsSystem(gameState)).withPriority(SystemPriorities.LOGIC);
 			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(textField, statusTextField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(creditsTextField, pendingCreditsTextField, messagesTextField, gameState), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(boardContainer, scaleFactor, viewTileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");
 
 			var tickProvider : ITickProvider = new StarlingFixedTickProvider(Starling.juggler, 0.017);
 			tickProvider.add(engine.update);
-			tickProvider.add(updateSharedState);
 			tickProvider.start();
-		}
-
-		private function updateSharedState(time : Number) : void
-		{
-			sharedState["matchPatternLevels"] = gameState.matchPatternLevels;
-		}
-
-		private function onStatusButtonTriggered(event : Event) : void
-		{
-			onStats.dispatch(this);
 		}
 	}
 }

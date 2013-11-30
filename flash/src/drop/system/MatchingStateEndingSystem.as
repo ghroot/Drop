@@ -29,7 +29,7 @@ package drop.system
 
 		override public function update(time : Number) : void
 		{
-			if (gameState.atLeastOneMatch)
+			if (gameState.matchInfos.length > 0)
 			{
 				SelectNodeUtils.deselectSelectNodes(selectNodeList);
 				gameState.isTryingSwap = false;

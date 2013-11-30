@@ -1,6 +1,7 @@
 package drop.board
 {
 	import drop.node.MatchNode;
+	import drop.util.MathUtils;
 
 	public class Match
 	{
@@ -25,8 +26,8 @@ package drop.board
 			var rightMostPositionX : Number = 0;
 			for each (var matchNode : MatchNode in matchNodes)
 			{
-				leftMostPositionX = min(leftMostPositionX, matchNode.transformComponent.x);
-				rightMostPositionX = max(rightMostPositionX, matchNode.transformComponent.x);
+				leftMostPositionX = MathUtils.min(leftMostPositionX, matchNode.transformComponent.x);
+				rightMostPositionX = MathUtils.max(rightMostPositionX, matchNode.transformComponent.x);
 			}
 			return rightMostPositionX - leftMostPositionX + tileSize;
 		}
@@ -37,20 +38,10 @@ package drop.board
 			var bottomMostPositionY : Number = 0;
 			for each (var matchNode : MatchNode in matchNodes)
 			{
-				topMostPositionY = min(topMostPositionY, matchNode.transformComponent.y);
-				bottomMostPositionY = max(bottomMostPositionY, matchNode.transformComponent.y);
+				topMostPositionY = MathUtils.min(topMostPositionY, matchNode.transformComponent.y);
+				bottomMostPositionY = MathUtils.max(bottomMostPositionY, matchNode.transformComponent.y);
 			}
 			return bottomMostPositionY - topMostPositionY + 70;
-		}
-
-		private function min(number1 : Number, number2 : Number) : Number
-		{
-			return number1 < number2 ? number1 : number2;
-		}
-
-		private function max(number1 : Number, number2 : Number) : Number
-		{
-			return number1 > number2 ? number1 : number2;
 		}
 	}
 }

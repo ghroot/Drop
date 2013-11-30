@@ -1,12 +1,6 @@
 package drop
 {
 	import drop.board.*;
-	import drop.stats.StatsScreen;
-
-	import feathers.controls.ScreenNavigator;
-	import feathers.controls.ScreenNavigatorItem;
-	import feathers.motion.transitions.ScreenSlidingStackTransitionManager;
-	import feathers.themes.MinimalMobileTheme;
 
 	import starling.display.Sprite;
 	import starling.text.BitmapFont;
@@ -39,12 +33,8 @@ package drop
 		[Embed(source="../../res/fontSmall-hd.fnt", mimeType="application/octet-stream")]
 		public const FontSmallHdXml : Class;
 
-		private var navigator : ScreenNavigator;
-		private var transitionManager : ScreenSlidingStackTransitionManager;
-
 		public function Root()
 		{
-			new MinimalMobileTheme();
 		}
 
 		public function start(scaleFactor : Number) : void
@@ -60,17 +50,7 @@ package drop
 				TextField.registerBitmapFont(new BitmapFont(Texture.fromBitmap(new FontSmallHdBitmap()), XML(new FontSmallHdXml())), "QuicksandSmall");
 			}
 
-			navigator = new ScreenNavigator();
-			addChild(navigator);
-
-			transitionManager = new ScreenSlidingStackTransitionManager(navigator);
-
-			var sharedState : Object = {};
-
-			navigator.addScreen("board", new ScreenNavigatorItem(new BoardScreen(scaleFactor, sharedState), { onStats: "stats" }));
-			navigator.addScreen("stats", new ScreenNavigatorItem(new StatsScreen(scaleFactor, sharedState), { onBack: "board" }));
-
-			navigator.showScreen("board");
+			addChild(new Board(scaleFactor));
 		}
 	}
 }
