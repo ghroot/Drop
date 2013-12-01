@@ -5,7 +5,7 @@ package drop.data
 		private var totalTime : Number;
 		private var timeLeft : Number;
 
-		public function Countdown(time : Number)
+		public function Countdown(time : Number = 0)
 		{
 			resetWithTime(time);
 		}

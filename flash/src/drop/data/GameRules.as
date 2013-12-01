@@ -9,15 +9,13 @@ package drop.data
 			this.gameState = gameState;
 		}
 
-		[Inline]
-		public final function addPendingCredits(value : int) : void
+		public function addPendingCredits(value : int) : void
 		{
 			gameState.pendingCredits += value;
 			gameState.pendingCreditsUpdated.dispatch(gameState.pendingCredits);
 		}
 
-		[Inline]
-		public final function addPendingCreditsToCredits() : void
+		public function addPendingCreditsToCredits() : void
 		{
 			gameState.credits += gameState.pendingCredits;
 			gameState.creditsUpdated.dispatch(gameState.credits);

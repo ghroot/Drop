@@ -2,11 +2,13 @@ package drop.component
 {
 	import ash.tools.ComponentPool;
 
+	import drop.data.ZOrder;
+
 	import starling.display.DisplayObject;
 
 	public class DisplayComponent
 	{
-		public var displayObject : DisplayObject;
+		public var displayComponentContainer : DisplayComponentContainer;
 
 		public static function create() : DisplayComponent
 		{
@@ -17,12 +19,18 @@ package drop.component
 
 		public function reset() : void
 		{
-			displayObject = null;
+			displayComponentContainer = null;
 		}
 
 		public function withDisplayObject(value : DisplayObject) : DisplayComponent
 		{
-			displayObject = value;
+			displayComponentContainer = new DisplayComponentContainer(value, ZOrder.MIDDLE);
+			return this;
+		}
+
+		public function withZ(value : int) : DisplayComponent
+		{
+			displayComponentContainer.z = value;
 			return this;
 		}
 	}

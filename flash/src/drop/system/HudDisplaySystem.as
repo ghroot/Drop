@@ -3,8 +3,6 @@ package drop.system
 	import ash.core.System;
 
 	import drop.data.GameState;
-	import drop.data.MatchPatternLevel;
-	import drop.data.MatchPatterns;
 
 	import starling.animation.Tween;
 	import starling.core.Starling;
@@ -15,21 +13,17 @@ package drop.system
 		private var gameState : GameState;
 		private var creditsTextField : TextField;
 		private var pendingCreditsTextField : TextField;
-		private var messagesTextField : TextField;
 
-		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField, messagesTextField : TextField, gameState : GameState)
+		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField, gameState : GameState)
 		{
 			this.creditsTextField = creditsTextField;
 			this.pendingCreditsTextField = pendingCreditsTextField;
-			this.messagesTextField = messagesTextField;
 			this.gameState = gameState;
 
 			pendingCreditsTextField.visible = false;
-			messagesTextField.visible = false;
 
 			gameState.creditsUpdated.add(onCreditsUpdated);
 			gameState.pendingCreditsUpdated.add(onPendingCreditsUpdated);
-			gameState.matchPatternLevelUpdated.add(onMatchPatternLevelUpdated);
 		}
 
 		private function onCreditsUpdated(credits : int) : void
@@ -74,23 +68,6 @@ package drop.system
 				};
 				Starling.juggler.add(tween);
 			}
-		}
-
-		private function onMatchPatternLevelUpdated(matchPatternLevel : MatchPatternLevel) : void
-		{
-			messagesTextField.text = "'" + MatchPatterns.getName(matchPatternLevel.pattern) + "' now at level " + matchPatternLevel.getLevel();
-			messagesTextField.visible = true;
-
-			var messageTween : Tween = new Tween(messagesTextField, 0.5);
-			messageTween.delay = 3;
-			messageTween.animate("alpha", 0);
-			messageTween.onComplete = function() : void
-			{
-				messagesTextField.visible = false;
-				messagesTextField.alpha = 1;
-				messagesTextField.text = "";
-			};
-			Starling.juggler.add(messageTween);
 		}
 	}
 }

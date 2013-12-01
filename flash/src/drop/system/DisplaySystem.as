@@ -5,12 +5,10 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
+	import drop.component.DisplayComponentContainer;
 	import drop.node.DisplayNode;
 
 	import starling.animation.IAnimatable;
-
-	import starling.animation.IAnimatable;
-
 	import starling.display.DisplayObjectContainer;
 
 	public class DisplaySystem extends System
@@ -55,20 +53,38 @@ package drop.system
 		{
 			updateTransform(displayNode);
 
-			displayObjectContainer.addChild(displayNode.displayComponent.displayObject);
+			displayNode.displayComponent.displayComponentContainer.addChild(displayNode.displayComponent.displayComponentContainer.displayObject);
+			displayObjectContainer.addChild(displayNode.displayComponent.displayComponentContainer);
+			displayObjectContainer.sortChildren(compareDisplayObjectsByZ);
+		}
+
+		private function compareDisplayObjectsByZ(displayComponentContainer1 : DisplayComponentContainer, displayComponentContainer2 : DisplayComponentContainer) : int
+		{
+			if (displayComponentContainer1.z < displayComponentContainer2.z)
+			{
+				return -1;
+			}
+			else if (displayComponentContainer1.z > displayComponentContainer2.z)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 
 		private function removeFromDisplayObjectContainer(displayNode : DisplayNode) : void
 		{
-			displayObjectContainer.removeChild(displayNode.displayComponent.displayObject);	
+			displayObjectContainer.removeChild(displayNode.displayComponent.displayComponentContainer);
 		}
 
 		private function updateTransform(displayNode : DisplayNode) : void
 		{
-			displayNode.displayComponent.displayObject.x = int(displayNode.transformComponent.x * scaleFactor + viewTileSize / 2);
-			displayNode.displayComponent.displayObject.y = int(displayNode.transformComponent.y * scaleFactor + viewTileSize / 2);
-			displayNode.displayComponent.displayObject.scaleX = displayNode.transformComponent.scale;
-			displayNode.displayComponent.displayObject.scaleY = displayNode.transformComponent.scale;
+			displayNode.displayComponent.displayComponentContainer.x = int(displayNode.transformComponent.x * scaleFactor + viewTileSize / 2);
+			displayNode.displayComponent.displayComponentContainer.y = int(displayNode.transformComponent.y * scaleFactor + viewTileSize / 2);
+			displayNode.displayComponent.displayComponentContainer.scaleX = displayNode.transformComponent.scale;
+			displayNode.displayComponent.displayComponentContainer.scaleY = displayNode.transformComponent.scale;
 		}
 
 		override public function update(time : Number) : void
@@ -79,9 +95,9 @@ package drop.system
 			{
 				updateTransform(displayNode);
 
-				if (displayNode.displayComponent.displayObject is IAnimatable)
+				if (displayNode.displayComponent.displayComponentContainer.displayObject is IAnimatable)
 				{
-					IAnimatable(displayNode.displayComponent.displayObject).advanceTime(time);
+					IAnimatable(displayNode.displayComponent.displayComponentContainer.displayObject).advanceTime(time);
 				}
 			}
 		}

@@ -33,7 +33,15 @@ package drop.system
 			{
 				SelectNodeUtils.deselectSelectNodes(selectNodeList);
 				gameState.isTryingSwap = false;
-				stateMachine.changeState("cascading");
+
+				if (gameState.matchInfoToHighlight != null)
+				{
+					stateMachine.changeState("highlighting");
+				}
+				else
+				{
+					stateMachine.changeState("cascading");
+				}
 			}
 			else if (gameState.isTryingSwap)
 			{

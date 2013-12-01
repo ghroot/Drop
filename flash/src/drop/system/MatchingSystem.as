@@ -12,7 +12,8 @@ package drop.system
 	import drop.data.MatchPatternLevel;
 	import drop.data.MatchPatterns;
 	import drop.node.MatchNode;
-	import drop.util.MathUtils;
+
+	import flash.geom.Point;
 
 	public class MatchingSystem extends System
 	{
@@ -37,6 +38,7 @@ package drop.system
 		override public function update(time : Number) : void
 		{
 			gameState.matchInfos.length = 0;
+			gameState.matchInfoToHighlight = null;
 
 			var matches : Vector.<Match> = matcher.getMatches(matchNodeList);
 			for each (var match : Match in matches)
@@ -46,7 +48,8 @@ package drop.system
 					matchNode.stateComponent.stateMachine.changeState("matched");
 				}
 
-				var matchPatternLevel : MatchPatternLevel = gameState.matchPatternLevels[MatchPatterns.getFromMatch(match)];
+				var pattern : int = MatchPatterns.getFromMatch(match);
+				var matchPatternLevel : MatchPatternLevel = gameState.matchPatternLevels[pattern];
 
 				var creditsToAdd : int = match.matchNodes.length;
 				if (match.matchNodes.length >= 5)
@@ -60,34 +63,30 @@ package drop.system
 				creditsToAdd += matchPatternLevel.getNumberOfBonusCredits();
 				gameRules.addPendingCredits(creditsToAdd);
 
+				var matchInfo : MatchInfo = createMatchInfo(pattern, match);
+
 				var level : int = matchPatternLevel.getLevel();
 				matchPatternLevel.points++;
 				if (matchPatternLevel.getLevel() > level)
 				{
-					gameState.matchPatternLevelUpdated.dispatch(matchPatternLevel);
+					// TODO: Handle several match infos to highlight
+					gameState.matchInfoToHighlight = matchInfo;
 				}
 
-				gameState.matchInfos[gameState.matchInfos.length] = createMatchInfo(match, creditsToAdd);
+				gameState.matchInfos[gameState.matchInfos.length] = matchInfo;
 			}
 
 			gameState.totalNumberOfMatchesDuringCascading += matches.length;
 		}
 
-		private function createMatchInfo(match : Match, credits : int) : MatchInfo
+		private function createMatchInfo(pattern : int, match : Match) : MatchInfo
 		{
-			var leftMostPositionX : Number;
-			var rightMostPositionX : Number;
-			var topMostPositionY : Number;
-			var bottomMostPositionY : Number;
+			var positions : Vector.<Point> = new Vector.<Point>();
 			for each (var matchNode : MatchNode in match.matchNodes)
 			{
-				leftMostPositionX = MathUtils.min(leftMostPositionX, matchNode.transformComponent.x);
-				rightMostPositionX = MathUtils.max(rightMostPositionX, matchNode.transformComponent.x);
-				topMostPositionY = MathUtils.min(topMostPositionY, matchNode.transformComponent.y);
-				bottomMostPositionY = MathUtils.max(bottomMostPositionY, matchNode.transformComponent.y);
+				positions[positions.length] = new Point(matchNode.transformComponent.x, matchNode.transformComponent.y);
 			}
-			return new MatchInfo(leftMostPositionX + (rightMostPositionX - leftMostPositionX) / 2,
-					topMostPositionY + (bottomMostPositionY - topMostPositionY) / 2, credits);
+			return new MatchInfo(pattern, positions);
 		}
 	}
 }

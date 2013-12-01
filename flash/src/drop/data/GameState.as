@@ -9,7 +9,6 @@ package drop.data
 	{
 		public var creditsUpdated : ISignal;
 		public var pendingCreditsUpdated : ISignal;
-		public var matchPatternLevelUpdated : ISignal;
 
 		public var inputs : Vector.<Input>;
 
@@ -22,6 +21,7 @@ package drop.data
 		public var isSwappingBack : Boolean;
 
 		public var matchInfos : Vector.<MatchInfo>;
+		public var matchInfoToHighlight : MatchInfo;
 		public var totalNumberOfMatchesDuringCascading : int;
 		public var totalNumberOfLineBlastsDuringCascading : int;
 
@@ -31,7 +31,6 @@ package drop.data
 		{
 			creditsUpdated = new Signal(int);
 			pendingCreditsUpdated = new Signal(int);
-			matchPatternLevelUpdated = new Signal(MatchPatternLevel);
 
 			inputs = new Vector.<Input>();
 			matchInfos = new Vector.<MatchInfo>();

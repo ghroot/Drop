@@ -22,6 +22,7 @@ package drop.board
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
 	import drop.component.script.TweenScript;
+	import drop.data.ZOrder;
 	import drop.util.DisplayUtils;
 
 	import flash.geom.Point;
@@ -69,6 +70,7 @@ package drop.board
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
 			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(quad);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(quad).withZ(ZOrder.TOP);
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
@@ -80,6 +82,26 @@ package drop.board
 			selectedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0.75, 0.05, true)));
 			selectedState.add(SelectComponent).withInstance(selectComponent);
 			selectedState.add(DisplayComponent).withInstance(displayComponent);
+
+			var highlightedState : EntityState = stateMachine.createState("highlighted");
+			highlightedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 1.5, 1)));
+			highlightedState.add(DisplayComponent).withInstance(highlightDisplayComponent);
+			highlightedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(4).withStateToChangeTo("highlightedDone"));
+
+			var highlightedDoneState : EntityState = stateMachine.createState("highlightedDone");
+			highlightedDoneState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 1, 0.5)));
+			highlightedDoneState.add(DisplayComponent).withInstance(highlightDisplayComponent);
+			highlightedDoneState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(1).withStateToChangeTo("matched"));
+
+			var fadedState : EntityState = stateMachine.createState("faded");
+			fadedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new AlphaScript(displayComponent, 0.1, 1)));
+			fadedState.add(DisplayComponent).withInstance(displayComponent);
+			fadedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(4).withStateToChangeTo("fadedDone"));
+
+			var fadedDoneState : EntityState = stateMachine.createState("fadedDone");
+			fadedDoneState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new AlphaScript(displayComponent, 1, 0.5)));
+			fadedDoneState.add(DisplayComponent).withInstance(displayComponent);
+			fadedDoneState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(1).withStateToChangeTo("idle"));
 
 			var matchedState : EntityState = stateMachine.createState("matched");
 			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.4)));
@@ -120,6 +142,7 @@ package drop.board
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
 			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(sprite);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(sprite).withZ(ZOrder.TOP);
 			var triggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create().withIsTriggered(true);
 			var nonTriggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create();
 
@@ -135,6 +158,26 @@ package drop.board
 			selectedState.add(SelectComponent).withInstance(selectComponent);
 			selectedState.add(LineBlastComponent).withInstance(nonTriggeredLineBlastComponent);
 			selectedState.add(DisplayComponent).withInstance(displayComponent);
+
+			var highlightedState : EntityState = stateMachine.createState("highlighted");
+			highlightedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 1.5, 1)));
+			highlightedState.add(DisplayComponent).withInstance(highlightDisplayComponent);
+			highlightedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(4).withStateToChangeTo("highlightedDone"));
+
+			var highlightedDoneState : EntityState = stateMachine.createState("highlightedDone");
+			highlightedDoneState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 1, 0.5)));
+			highlightedDoneState.add(DisplayComponent).withInstance(highlightDisplayComponent);
+			highlightedDoneState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(1).withStateToChangeTo("matched"));
+
+			var fadedState : EntityState = stateMachine.createState("faded");
+			fadedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new AlphaScript(displayComponent, 0.1, 1)));
+			fadedState.add(DisplayComponent).withInstance(displayComponent);
+			fadedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(4).withStateToChangeTo("fadedDone"));
+
+			var fadedDoneState : EntityState = stateMachine.createState("fadedDone");
+			fadedDoneState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new AlphaScript(displayComponent, 1, 0.5)));
+			fadedDoneState.add(DisplayComponent).withInstance(displayComponent);
+			fadedDoneState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(1).withStateToChangeTo("idle"));
 
 			var matchedState : EntityState = stateMachine.createState("matched");
 			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create()

@@ -46,7 +46,7 @@ package drop
 			mStarling = new Starling(Root, stage);
 			mStarling.simulateMultitouch  = false;
 			mStarling.enableErrorChecking = false;
-			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
+//			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
 
 			stage.addEventListener(flash.events.Event.RESIZE, onResize);
 

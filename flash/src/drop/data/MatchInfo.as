@@ -1,16 +1,16 @@
 package drop.data
 {
+	import flash.geom.Point;
+
 	public class MatchInfo
 	{
-		public var positionX : Number;
-		public var positionY : Number;
-		public var numberOfCredits : int;
+		public var pattern : int;
+		public var positions : Vector.<Point>;
 
-		public function MatchInfo(positionX : Number, positionY : Number, numberOfCredits : int)
+		public function MatchInfo(pattern : int, positions : Vector.<Point>)
 		{
-			this.positionX = positionX;
-			this.positionY = positionY;
-			this.numberOfCredits = numberOfCredits;
+			this.pattern = pattern;
+			this.positions = positions;
 		}
 	}
 }

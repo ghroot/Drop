@@ -14,6 +14,8 @@ package drop.board
 	import drop.system.ComboSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
+	import drop.system.HighlightSystem;
+	import drop.system.HighlightingStateEndingSystem;
 	import drop.system.HudDisplaySystem;
 	import drop.system.LineBlastDetonationSystem;
 	import drop.system.MatchingStateEndingSystem;
@@ -91,13 +93,6 @@ package drop.board
 			pendingCreditsTextField.y = creditsTextField.y + creditsTextField.height / 2;
 			addChild(pendingCreditsTextField);
 
-			var messagesTextField : TextField = new TextField(stage.stageWidth, 30 * scaleFactor, "", "QuicksandSmall", 20 * scaleFactor);
-			messagesTextField.hAlign = HAlign.CENTER;
-			messagesTextField.vAlign = VAlign.BOTTOM;
-			messagesTextField.pivotY = messagesTextField.height;
-			messagesTextField.y = creditsTextField.y - creditsTextField.height / 2;
-			addChild(messagesTextField);
-
 			var gameState : GameState = new GameState();
 			var gameRules : GameRules = new GameRules(gameState);
 
@@ -143,6 +138,10 @@ package drop.board
 			matchingState.addInstance(new MatchingSystem(matcher, gameState, gameRules)).withPriority(SystemPriorities.LOGIC);
 			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
+			var highlightingState : EngineState = stateMachine.createState("highlighting");
+			highlightingState.addInstance(new HighlightSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
+			highlightingState.addInstance(new HighlightingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
+
 			var cascadingState : EngineState = stateMachine.createState("cascading");
 			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager, boardSize, modelTileSize, gameState)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new SpawnerSystem(modelTileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
@@ -157,7 +156,7 @@ package drop.board
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(creditsTextField, pendingCreditsTextField, messagesTextField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(creditsTextField, pendingCreditsTextField, gameState), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(boardContainer, scaleFactor, viewTileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");

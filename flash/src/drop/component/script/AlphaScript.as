@@ -26,11 +26,11 @@ package drop.component.script
 		{
 			if (tweenDuration == 0)
 			{
-				displayComponent.displayObject.alpha = alpha;
+				displayComponent.displayComponentContainer.alpha = alpha;
 			}
 			else
 			{
-				tween = new Tween(displayComponent.displayObject, tweenDuration);
+				tween = new Tween(displayComponent.displayComponentContainer, tweenDuration);
 				tween.animate("alpha", alpha);
 			}
 		}
@@ -47,7 +47,7 @@ package drop.component.script
 		{
 			if (resetOnEnd)
 			{
-				displayComponent.displayObject.alpha = 1;
+				displayComponent.displayComponentContainer.alpha = 1;
 			}
 			tween = null;
 		}
