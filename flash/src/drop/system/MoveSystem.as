@@ -72,7 +72,7 @@ package drop.system
 
 		private function sortMoveNodeList() : void
 		{
-			moveNodeList.mergeSort(compareMoveNodes);
+			moveNodeList.insertionSort(compareMoveNodes);
 		}
 
 		private function compareMoveNodes(moveNode1 : MoveNode, moveNode2 : MoveNode) : int

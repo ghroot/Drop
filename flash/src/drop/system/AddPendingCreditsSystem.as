@@ -2,20 +2,20 @@ package drop.system
 {
 	import ash.core.System;
 
-	import drop.data.GameState;
+	import drop.data.GameRules;
 
 	public class AddPendingCreditsSystem extends System
 	{
-		private var gameState : GameState;
+		private var gameRules : GameRules;
 
-		public function AddPendingCreditsSystem(gameState : GameState)
+		public function AddPendingCreditsSystem(gameRules : GameRules)
 		{
-			this.gameState = gameState;
+			this.gameRules = gameRules;
 		}
 
 		override public function update(time : Number) : void
 		{
-			gameState.addPendingCreditsToCredits();
+			gameRules.addPendingCreditsToCredits();
 		}
 	}
 }

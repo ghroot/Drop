@@ -6,6 +6,7 @@ package drop.system
 
 	import drop.board.Match;
 	import drop.board.Matcher;
+	import drop.data.GameRules;
 	import drop.data.GameState;
 	import drop.data.MatchInfo;
 	import drop.data.MatchPatternLevel;
@@ -17,13 +18,15 @@ package drop.system
 	{
 		private var matcher : Matcher;
 		private var gameState : GameState;
+		private var gameRules : GameRules;
 
 		private var matchNodeList : NodeList;
 
-		public function MatchingSystem(matcher : Matcher, gameState : GameState)
+		public function MatchingSystem(matcher : Matcher, gameState : GameState, gameRules : GameRules)
 		{
 			this.matcher = matcher;
 			this.gameState = gameState;
+			this.gameRules = gameRules;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -55,7 +58,7 @@ package drop.system
 					creditsToAdd *= 2;
 				}
 				creditsToAdd += matchPatternLevel.getNumberOfBonusCredits();
-				gameState.addPendingCredits(creditsToAdd);
+				gameRules.addPendingCredits(creditsToAdd);
 
 				var level : int = matchPatternLevel.getLevel();
 				matchPatternLevel.points++;

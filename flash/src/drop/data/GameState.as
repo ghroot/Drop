@@ -41,22 +41,5 @@ package drop.data
 			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, Vector.<int>([0, 0, 3, 10, 30, 100]));
 			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, Vector.<int>([0, 0, 2, 5, 10, 30]));
 		}
-
-		[Inline]
-		public final function addPendingCredits(value : int) : void
-		{
-			pendingCredits += value;
-			pendingCreditsUpdated.dispatch(pendingCredits);
-		}
-
-		[Inline]
-		public final function addPendingCreditsToCredits() : void
-		{
-			credits += pendingCredits;
-			creditsUpdated.dispatch(credits);
-
-			pendingCredits = 0;
-			pendingCreditsUpdated.dispatch(0);
-		}
 	}
 }

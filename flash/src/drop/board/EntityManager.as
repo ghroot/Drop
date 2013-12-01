@@ -87,6 +87,8 @@ package drop.board
 			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.4));
 
 			var destroyedByLineBlastState : EntityState = stateMachine.createState("destroyedByLineBlast");
+			destroyedByLineBlastState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.2)));
+			destroyedByLineBlastState.add(DisplayComponent).withInstance(displayComponent);
 			destroyedByLineBlastState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.6));
 
 			entity.add(transformComponent);
@@ -165,21 +167,21 @@ package drop.board
 		{
 			var entity : Entity = new Entity();
 
-			var fadedHorizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 8 * scaleFactor, color);
+			var fadedHorizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 14 * scaleFactor, color);
 			fadedHorizontalQuad.alpha = 0.2;
 			fadedHorizontalQuad.pivotX = (x / modelTileSize * viewTileSize) + viewTileSize / 2;
 			DisplayUtils.centerPivotY(fadedHorizontalQuad);
 
-			var horizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 2 * scaleFactor, color);
+			var horizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 4 * scaleFactor, color);
 			horizontalQuad.pivotX = (x / modelTileSize * viewTileSize) + viewTileSize / 2;
 			DisplayUtils.centerPivotY(horizontalQuad);
 
-			var fadedVerticalQuad : Quad = new Quad(8 * scaleFactor, boardSize.y * viewTileSize, color);
+			var fadedVerticalQuad : Quad = new Quad(14 * scaleFactor, boardSize.y * viewTileSize, color);
 			fadedVerticalQuad.alpha = 0.3;
 			fadedVerticalQuad.pivotY = (y / modelTileSize * viewTileSize) + viewTileSize / 2;
 			DisplayUtils.centerPivotX(fadedVerticalQuad);
 
-			var verticalQuad : Quad = new Quad(2 * scaleFactor, boardSize.y * viewTileSize, color);
+			var verticalQuad : Quad = new Quad(4 * scaleFactor, boardSize.y * viewTileSize, color);
 			verticalQuad.pivotY = (y / modelTileSize * viewTileSize) + viewTileSize / 2;
 			DisplayUtils.centerPivotX(verticalQuad);
 
@@ -190,11 +192,14 @@ package drop.board
 			sprite.addChild(verticalQuad);
 			entity.add(DisplayComponent.create().withDisplayObject(sprite));
 
-			var tween : Tween = new Tween(sprite, 0.075);
-			tween.animate("alpha", 0.6);
-			tween.repeatCount = int.MAX_VALUE;
-			tween.reverse = true;
-			entity.add(ScriptComponent.create().withScript(new TweenScript(tween)));
+			var pulsateTween : Tween = new Tween(sprite, 0.075);
+			pulsateTween.animate("alpha", 0.6);
+			pulsateTween.repeatCount = 2;
+			pulsateTween.reverse = true;
+			var fadeTween : Tween = new Tween(sprite, 0.45);
+			fadeTween.delay = 0.15;
+			fadeTween.animate("alpha", 0);
+			entity.add(ScriptComponent.create().withScript(new TweenScript(pulsateTween)).withScript(new TweenScript(fadeTween)));
 
 			entity.add(CountdownComponent.create().withTime(0.6));
 			entity.add(TransformComponent.create().withX(x).withY(y));

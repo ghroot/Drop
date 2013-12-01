@@ -2,15 +2,18 @@ package drop.system
 {
 	import ash.core.System;
 
+	import drop.data.GameRules;
 	import drop.data.GameState;
 
 	public class ComboSystem extends System
 	{
 		private var gameState : GameState;
+		private var gameRules : GameRules;
 
-		public function ComboSystem(gameState : GameState)
+		public function ComboSystem(gameState : GameState, gameRules : GameRules)
 		{
 			this.gameState = gameState;
+			this.gameRules = gameRules;
 		}
 
 		override public function update(time : Number) : void
@@ -23,15 +26,15 @@ package drop.system
 		{
 			if (gameState.totalNumberOfMatchesDuringCascading >= 50)
 			{
-				gameState.addPendingCredits(5000);
+				gameRules.addPendingCredits(5000);
 			}
 			else if (gameState.totalNumberOfMatchesDuringCascading >= 20)
 			{
-				gameState.addPendingCredits(1000);
+				gameRules.addPendingCredits(1000);
 			}
 			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 10)
 			{
-				gameState.addPendingCredits(200);
+				gameRules.addPendingCredits(200);
 			}
 
 			gameState.totalNumberOfMatchesDuringCascading = 0;
@@ -41,15 +44,15 @@ package drop.system
 		{
 			if (gameState.totalNumberOfLineBlastsDuringCascading >= 10)
 			{
-				gameState.addPendingCredits(1000);
+				gameRules.addPendingCredits(1000);
 			}
 			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 5)
 			{
-				gameState.addPendingCredits(300);
+				gameRules.addPendingCredits(300);
 			}
 			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 3)
 			{
-				gameState.addPendingCredits(50);
+				gameRules.addPendingCredits(50);
 			}
 
 			gameState.totalNumberOfLineBlastsDuringCascading = 0;

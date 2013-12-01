@@ -6,6 +6,7 @@ package drop.board
 	import ash.integration.starling.StarlingFixedTickProvider;
 	import ash.tick.ITickProvider;
 
+	import drop.data.GameRules;
 	import drop.data.GameState;
 	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
@@ -98,6 +99,7 @@ package drop.board
 			addChild(messagesTextField);
 
 			var gameState : GameState = new GameState();
+			var gameRules : GameRules = new GameRules(gameState);
 
 			var engine : Engine = new Engine();
 
@@ -138,7 +140,7 @@ package drop.board
 			swappingState.addInstance(new SwappingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var matchingState : EngineState = stateMachine.createState("matching");
-			matchingState.addInstance(new MatchingSystem(matcher, gameState)).withPriority(SystemPriorities.LOGIC);
+			matchingState.addInstance(new MatchingSystem(matcher, gameState, gameRules)).withPriority(SystemPriorities.LOGIC);
 			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
@@ -148,8 +150,8 @@ package drop.board
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var turnEndState : EngineState = stateMachine.createState("turnEnd");
-			turnEndState.addInstance(new ComboSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
-			turnEndState.addInstance(new AddPendingCreditsSystem(gameState)).withPriority(SystemPriorities.LOGIC);
+			turnEndState.addInstance(new ComboSystem(gameState, gameRules)).withPriority(SystemPriorities.PRE_LOGIC);
+			turnEndState.addInstance(new AddPendingCreditsSystem(gameRules)).withPriority(SystemPriorities.LOGIC);
 			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
