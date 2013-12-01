@@ -14,6 +14,7 @@ package drop.board
 	import drop.system.ComboSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
+	import drop.system.HighlightDisplaySystem;
 	import drop.system.HighlightSystem;
 	import drop.system.HighlightingStateEndingSystem;
 	import drop.system.HudDisplaySystem;
@@ -140,6 +141,7 @@ package drop.board
 
 			var highlightingState : EngineState = stateMachine.createState("highlighting");
 			highlightingState.addInstance(new HighlightSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
+			highlightingState.addInstance(new HighlightDisplaySystem(overlayContainer, scaleFactor, boardSize, viewTileSize, gameState)).withPriority(SystemPriorities.DISPLAY);
 			highlightingState.addInstance(new HighlightingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
