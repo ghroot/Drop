@@ -1,7 +1,5 @@
 package drop
 {
-	import drop.Root;
-
 	import flash.desktop.NativeApplication;
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
@@ -11,10 +9,6 @@ package drop
 
 	import starling.core.Starling;
 	import starling.events.Event;
-	import starling.utils.HAlign;
-	import starling.utils.RectangleUtil;
-	import starling.utils.ScaleMode;
-	import starling.utils.VAlign;
 
 	[SWF(backgroundColor="0xffffff", frameRate="60")]
 	public class Drop extends Sprite
