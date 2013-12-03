@@ -36,7 +36,8 @@ package drop.system
 				if (canEntityBeCreatedAt(spawnerNode))
 				{
 					var entity : Entity;
-					if (Math.random() <= 0.1)
+					var chanceToCreateLineBlast : int = getChanceToCreateLineBlast(spawnerNode);
+					if (Math.random() * 101 <= chanceToCreateLineBlast)
 					{
 						entity = entityManager.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
 					}
@@ -65,6 +66,21 @@ package drop.system
 				}
 			}
 			return true;
+		}
+
+		private function getChanceToCreateLineBlast(spawnerNode : SpawnerNode) : int
+		{
+			switch (spawnerNode.spawnerComponent.spawnerLevel.level)
+			{
+				case 1:
+					return 0;
+				case 2:
+					return 5;
+				case 3:
+					return 10;
+				default:
+					return 15;
+			}
 		}
 	}
 }

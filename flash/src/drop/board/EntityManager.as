@@ -28,32 +28,24 @@ package drop.board
 	import flash.geom.Point;
 
 	import starling.animation.Tween;
+	import starling.display.Image;
 	import starling.display.Quad;
 	import starling.display.Sprite;
+	import starling.utils.AssetManager;
 
 	public class EntityManager
 	{
 		private var engine : Engine;
+		private var assets : AssetManager;
 		private var boardSize : Point;
-		private var modelTileSize : int;
-		private var viewTileSize : int;
-		private var scaleFactor : Number;
+		private var tileSize : int;
 
-		private var colors : Vector.<int>;
-
-		public function EntityManager(engine : Engine, boardSize : Point, modelTileSize : int, viewTileSize : int, scaleFactor : Number)
+		public function EntityManager(engine : Engine, assets : AssetManager, boardSize : Point, tileSize : int)
 		{
 			this.engine = engine;
+			this.assets = assets;
 			this.boardSize = boardSize;
-			this.modelTileSize = modelTileSize;
-			this.viewTileSize = viewTileSize;
-			this.scaleFactor = scaleFactor;
-
-			colors = new Vector.<int>();
-			for (var i : int = 0; i < 5; i++)
-			{
-				colors[colors.length] = Math.random() * 16777215;
-			}
+			this.tileSize = tileSize;
 		}
 
 		public function createTile(x : Number, y : Number) : Entity
@@ -62,15 +54,15 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var color : int = colors[Math.floor(Math.random() * colors.length)];
-			var quad : Quad = new Quad(viewTileSize, viewTileSize, color);
-			DisplayUtils.centerPivot(quad);
-			quad.touchable = false;
+			var color : int = 1 + Math.floor(Math.random() * 5);
+			var image : Image = new Image(assets.getTexture("tile_" + color));
+			DisplayUtils.centerPivot(image);
+			image.touchable = false;
 
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
-			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(quad);
-			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(quad).withZ(ZOrder.TOP);
+			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image).withZ(ZOrder.TOP);
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
@@ -129,20 +121,15 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var color : int = colors[Math.floor(Math.random() * colors.length)];
-			var sprite : Sprite = new Sprite();
-			var quad : Quad = new Quad(viewTileSize, viewTileSize, color);
-			sprite.addChild(quad);
-			var smallQuad : Quad = new Quad(viewTileSize / 4, viewTileSize / 4, 0xffffff);
-			smallQuad.x = smallQuad.y = 1.5 * viewTileSize / 4;
-			sprite.addChild(smallQuad);
-			DisplayUtils.centerPivot(sprite);
-			sprite.touchable = false;
+			var color : int = 1 + Math.floor(Math.random() * 5);
+			var image : Image = new Image(assets.getTexture("tile_" + color));
+			DisplayUtils.centerPivot(image);
+			image.touchable = false;
 
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
-			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(sprite);
-			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(sprite).withZ(ZOrder.TOP);
+			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image).withZ(ZOrder.TOP);
 			var triggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create().withIsTriggered(true);
 			var nonTriggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create();
 
@@ -210,22 +197,22 @@ package drop.board
 		{
 			var entity : Entity = new Entity();
 
-			var fadedHorizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 14 * scaleFactor, color);
+			var fadedHorizontalQuad : Quad = new Quad(boardSize.x * tileSize, 14, color);
 			fadedHorizontalQuad.alpha = 0.2;
-			fadedHorizontalQuad.pivotX = (x / modelTileSize * viewTileSize) + viewTileSize / 2;
+			fadedHorizontalQuad.pivotX = (x / tileSize * tileSize) + tileSize / 2;
 			DisplayUtils.centerPivotY(fadedHorizontalQuad);
 
-			var horizontalQuad : Quad = new Quad(boardSize.x * viewTileSize, 4 * scaleFactor, color);
-			horizontalQuad.pivotX = (x / modelTileSize * viewTileSize) + viewTileSize / 2;
+			var horizontalQuad : Quad = new Quad(boardSize.x * tileSize, 4, color);
+			horizontalQuad.pivotX = (x / tileSize * tileSize) + tileSize / 2;
 			DisplayUtils.centerPivotY(horizontalQuad);
 
-			var fadedVerticalQuad : Quad = new Quad(14 * scaleFactor, boardSize.y * viewTileSize, color);
+			var fadedVerticalQuad : Quad = new Quad(14, boardSize.y * tileSize, color);
 			fadedVerticalQuad.alpha = 0.3;
-			fadedVerticalQuad.pivotY = (y / modelTileSize * viewTileSize) + viewTileSize / 2;
+			fadedVerticalQuad.pivotY = y + tileSize / 2;
 			DisplayUtils.centerPivotX(fadedVerticalQuad);
 
-			var verticalQuad : Quad = new Quad(4 * scaleFactor, boardSize.y * viewTileSize, color);
-			verticalQuad.pivotY = (y / modelTileSize * viewTileSize) + viewTileSize / 2;
+			var verticalQuad : Quad = new Quad(4, boardSize.y * tileSize, color);
+			verticalQuad.pivotY = y + tileSize / 2;
 			DisplayUtils.centerPivotX(verticalQuad);
 
 			var sprite : Sprite = new Sprite();

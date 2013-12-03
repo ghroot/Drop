@@ -26,6 +26,7 @@ package drop.data
 		public var totalNumberOfLineBlastsDuringCascading : int;
 
 		public var matchPatternLevels : Dictionary;
+		public var isSelecting : Boolean;
 
 		public function GameState()
 		{

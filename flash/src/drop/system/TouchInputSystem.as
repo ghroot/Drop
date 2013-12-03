@@ -16,15 +16,13 @@ package drop.system
 	public class TouchInputSystem extends System
 	{
 		private var boardDisplayObject : DisplayObject;
-		private var scaleFactor : Number;
 		private var gameState : GameState;
 
 		private var inputsSinceLastUpdate : Vector.<Input>;
 
-		public function TouchInputSystem(boardDisplayObject : DisplayObject, scaleFactor : Number, gameState : GameState)
+		public function TouchInputSystem(boardDisplayObject : DisplayObject, gameState : GameState)
 		{
 			this.boardDisplayObject = boardDisplayObject;
-			this.scaleFactor = scaleFactor;
 			this.gameState = gameState;
 		}
 
@@ -56,8 +54,6 @@ package drop.system
 			if (touch != null)
 			{
 				var position : Point = touch.getLocation(boardDisplayObject);
-				position.x /= scaleFactor;
-				position.y /= scaleFactor;
 
 				if (touch.phase == TouchPhase.BEGAN)
 				{

@@ -28,7 +28,13 @@ package drop.system
 		{
 			selectNodeList = engine.getNodeList(SelectNode);
 
+			gameState.isSelecting = true;
 			gameState.shouldStartSwap = false;
+		}
+
+		override public function removeFromEngine(engine : Engine) : void
+		{
+			gameState.isSelecting = false;
 		}
 
 		override protected function handleInput(input : Input) : void

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:06c1e919bf74d4e5eddc06586a1a3226:2f003811665e6de7c4d0551fe913914e:d8ee52167869d148a52a8627be0cb789$ -->
+<TextureAtlas imagePath="spritesheeth.png">
+    <SubTexture name="spawner" x="48" y="94" width="44" height="44"/>
+    <SubTexture name="tile_1" x="2" y="94" width="44" height="44"/>
+    <SubTexture name="tile_2" x="48" y="48" width="44" height="44"/>
+    <SubTexture name="tile_3" x="2" y="48" width="44" height="44"/>
+    <SubTexture name="tile_4" x="48" y="2" width="44" height="44"/>
+    <SubTexture name="tile_5" x="2" y="2" width="44" height="44"/>
+</TextureAtlas>

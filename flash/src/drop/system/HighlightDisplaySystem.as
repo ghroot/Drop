@@ -22,22 +22,20 @@ package drop.system
 	public class HighlightDisplaySystem extends System
 	{
 		private var container : Sprite;
-		private var scaleFactor : Number;
 		private var boardSize : Point;
-		private var viewTileSize : int;
+		private var tileSize : int;
 		private var gameState : GameState;
 
 		private var textField : TextField;
 
-		public function HighlightDisplaySystem(container : Sprite, scaleFactor : Number, boardSize : Point, viewTileSize : int, gameState : GameState)
+		public function HighlightDisplaySystem(container : Sprite, boardSize : Point, tileSize : int, gameState : GameState)
 		{
 			this.container = container;
-			this.scaleFactor = scaleFactor;
 			this.boardSize = boardSize;
-			this.viewTileSize = viewTileSize;
+			this.tileSize = tileSize;
 			this.gameState = gameState;
 
-			textField = new TextField(150 * scaleFactor, 100 * scaleFactor, "", "QuicksandSmall", 20 * scaleFactor, Color.BLACK);
+			textField = new TextField(150, 100, "", "fontSmall", 20, Color.BLACK);
 			textField.hAlign = HAlign.CENTER;
 			textField.vAlign = VAlign.CENTER;
 		}
@@ -49,36 +47,36 @@ package drop.system
 
 			var bounds : Rectangle = getMatchBounds(gameState.matchInfoToHighlight);
 			var spaceUp : Number = bounds.y;
-			var spaceDown : Number = boardSize.y * viewTileSize - (bounds.y + bounds.height);
+			var spaceDown : Number = boardSize.y * tileSize - (bounds.y + bounds.height);
 			var spaceLeft : Number = bounds.x;
-			var spaceRight : Number = boardSize.x * viewTileSize - (bounds.x + bounds.width);
+			var spaceRight : Number = boardSize.x * tileSize - (bounds.x + bounds.width);
 			var max : Number = maxOfFour(spaceUp, spaceDown, spaceLeft, spaceRight);
 			if (max == spaceUp)
 			{
 				textField.pivotX = textField.width / 2;
 				textField.pivotY = textField.height;
 				textField.x = bounds.x + bounds.width / 2;
-				textField.y = bounds.y - 10 * scaleFactor;
+				textField.y = bounds.y - 10;
 			}
 			else if (max == spaceDown)
 			{
 				textField.pivotX = textField.width / 2;
 				textField.pivotY = 0;
 				textField.x = bounds.x + bounds.width / 2;
-				textField.y = bounds.y + + bounds.height + 10 * scaleFactor;
+				textField.y = bounds.y + + bounds.height + 10;
 			}
 			else if (max == spaceLeft)
 			{
 				textField.pivotX = textField.width;
 				textField.pivotY = textField.height / 2;
-				textField.x = bounds.x - 10 * scaleFactor;
+				textField.x = bounds.x - 10;
 				textField.y = bounds.y + bounds.height / 2;
 			}
 			else
 			{
 				textField.pivotX = 0;
 				textField.pivotY = textField.height / 2;
-				textField.x = bounds.x + bounds.width + 10 * scaleFactor;
+				textField.x = bounds.x + bounds.width + 10;
 				textField.y = bounds.y + bounds.height / 2;
 			}
 
@@ -108,12 +106,12 @@ package drop.system
 			var bottomMostY : Number = Number.MIN_VALUE;
 			for each (var position : Point in matchInfo.positions)
 			{
-				leftMostX = MathUtils.min(leftMostX, position.x * scaleFactor);
-				rightMostX = MathUtils.max(rightMostX, position.x * scaleFactor);
-				topMostY = MathUtils.min(topMostY, position.y * scaleFactor);
-				bottomMostY = MathUtils.max(bottomMostY, position.y * scaleFactor);
+				leftMostX = MathUtils.min(leftMostX, position.x);
+				rightMostX = MathUtils.max(rightMostX, position.x);
+				topMostY = MathUtils.min(topMostY, position.y);
+				bottomMostY = MathUtils.max(bottomMostY, position.y);
 			}
-			return new Rectangle(leftMostX, topMostY, rightMostX - leftMostX + viewTileSize, bottomMostY - topMostY + viewTileSize);
+			return new Rectangle(leftMostX, topMostY, rightMostX - leftMostX + tileSize, bottomMostY - topMostY + tileSize);
 		}
 
 		private function maxOfFour(a : Number, b : Number, c : Number, d : Number) : Number
