@@ -9,6 +9,7 @@ package drop.board
 	import drop.data.GameRules;
 	import drop.data.GameState;
 	import drop.node.SpawnerNode;
+	import drop.scene.SceneContainer;
 	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
 	import drop.system.CascadingStateEndingSystem;
@@ -32,23 +33,19 @@ package drop.board
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
-	import drop.util.DisplayUtils;
 	import drop.util.MathUtils;
 
 	import flash.geom.Point;
 
 	import starling.core.Starling;
-	import starling.display.BlendMode;
 	import starling.display.Button;
 	import starling.display.DisplayObject;
-	import starling.display.Image;
 	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
-	import starling.text.BitmapFont;
 	import starling.text.TextField;
 	import starling.textures.RenderTexture;
 	import starling.utils.AssetManager;
@@ -65,10 +62,7 @@ package drop.board
 
 		private var boardSize : Point;
 		private var tileSize : int;
-		private var boardPosition : Point;
-		private var boardContainer : Sprite;
-		private var touchQuad : Quad;
-		private var spawnerButtonsContainer : Sprite;
+		private var sceneContainer : SceneContainer;
 		private var dragStartPositionY : Number = -1;
 
 		public function Board(assets : AssetManager)
@@ -82,82 +76,32 @@ package drop.board
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
+			setupSize();
+			setupUi();
+			createWorld();
+		}
+
+		private function setupSize() : void
+		{
 			boardSize = new Point(7, 7);
 			tileSize = 44;
+		}
 
-			var padding : Number = (stage.stageWidth - boardSize.x * tileSize) / 2;
-			boardPosition = new Point(padding, padding);
+		private function setupUi() : void
+		{
+			sceneContainer = new SceneContainer(assets, boardSize, tileSize);
+			addChild(sceneContainer);
 
-			var backgroundImage : Image = new Image(assets.getTexture("background"));
-			DisplayUtils.centerPivot(backgroundImage);
-			backgroundImage.x = stage.stageWidth / 2;
-			backgroundImage.y = stage.stageHeight / 2;
-			backgroundImage.touchable = true;
-			backgroundImage.blendMode = BlendMode.NONE;
-			addChild(backgroundImage);
+			sceneContainer.bottomTouchQuad.addEventListener(TouchEvent.TOUCH, onBottomTouch);
 
-			touchQuad = new Quad(boardSize.x * tileSize, boardSize.y * tileSize);
-			touchQuad.x = boardPosition.x;
-			touchQuad.y = boardPosition.y;
-			touchQuad.alpha = 0;
-			touchQuad.blendMode = BlendMode.NONE;
-			addChild(touchQuad);
-
-			boardContainer = new Sprite();
-			boardContainer.x = boardPosition.x;
-			boardContainer.y = boardPosition.y;
-			boardContainer.touchable = false;
-			addChild(boardContainer);
-
-			spawnerButtonsContainer = new Sprite();
-			spawnerButtonsContainer.x = padding;
-			spawnerButtonsContainer.y = boardContainer.y - tileSize;
-			for (column = 0; column < boardSize.x; column++)
+			for each (var spawnerButton : Button in sceneContainer.spawnerButtons)
 			{
-				var renderTexture : RenderTexture = new RenderTexture(tileSize, tileSize);
-				var image : Image = new Image(assets.getTexture("spawner"));
-				renderTexture.draw(image);
-				var spawnerLevelTextField : TextField = new TextField(tileSize, tileSize, "1", "fontSmall", 20, Color.WHITE);
-				spawnerLevelTextField.hAlign = HAlign.CENTER;
-				spawnerLevelTextField.vAlign = VAlign.CENTER;
-				renderTexture.draw(spawnerLevelTextField);
-				var spawnerButton : Button = new Button(renderTexture);
-				spawnerButton.x = column * tileSize;
 				spawnerButton.addEventListener(Event.TRIGGERED, onSpawnerButtonTriggered);
-				spawnerButtonsContainer.addChild(spawnerButton);
 			}
-			spawnerButtonsContainer.alpha = 0;
-			addChild(spawnerButtonsContainer);
+		}
 
-			var overlayContainer : Sprite = new Sprite();
-			overlayContainer.x = boardPosition.x;
-			overlayContainer.y = boardPosition.y;
-			overlayContainer.touchable = false;
-			addChild(overlayContainer);
-
-			var creditsTextField : TextField = new TextField(stage.stageWidth, 70, "0", "font", 60);
-			creditsTextField.hAlign = HAlign.CENTER;
-			creditsTextField.vAlign = VAlign.CENTER;
-			DisplayUtils.centerPivot(creditsTextField);
-			creditsTextField.x = stage.stageWidth / 2;
-			creditsTextField.y = boardPosition.y + boardSize.y * tileSize + (stage.stageHeight - boardSize.y * tileSize - boardPosition.y) / 2;
-			creditsTextField.touchable = false;
-			addChild(creditsTextField);
-
-			var pendingCreditsTextField : TextField = new TextField(stage.stageWidth, 30, "0", "fontSmall", 20);
-			pendingCreditsTextField.hAlign = HAlign.CENTER;
-			pendingCreditsTextField.vAlign = VAlign.TOP;
-			pendingCreditsTextField.y = creditsTextField.y + 26;
-			pendingCreditsTextField.touchable = false;
-			addChild(pendingCreditsTextField);
-
-			var bottomTouchQuad : Quad = new Quad(stage.stageWidth, stage.stageHeight - boardSize.y * tileSize - padding);
-			bottomTouchQuad.y = boardPosition.y + boardSize.y * tileSize + padding;
-			bottomTouchQuad.alpha = 0;
-			bottomTouchQuad.blendMode = BlendMode.NONE;
-			bottomTouchQuad.addEventListener(TouchEvent.TOUCH, onBottomTouch);
-			addChild(bottomTouchQuad);
-
+		private function createWorld() : void
+		{
 			gameState = new GameState();
 			var gameRules : GameRules = new GameRules(gameState);
 
@@ -191,7 +135,7 @@ package drop.board
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var selectingState : EngineState = stateMachine.createState("selecting");
-			selectingState.addInstance(new TouchInputSystem(touchQuad, gameState)).withPriority(SystemPriorities.INPUT);
+			selectingState.addInstance(new TouchInputSystem(sceneContainer.touchQuad, gameState)).withPriority(SystemPriorities.INPUT);
 			selectingState.addInstance(new SelectControlSystem(gameState, tileSize)).withPriority(SystemPriorities.CONTROL);
 			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
 
@@ -205,7 +149,7 @@ package drop.board
 
 			var highlightingState : EngineState = stateMachine.createState("highlighting");
 			highlightingState.addInstance(new HighlightSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
-			highlightingState.addInstance(new HighlightDisplaySystem(overlayContainer, boardSize, tileSize, gameState)).withPriority(SystemPriorities.DISPLAY);
+			highlightingState.addInstance(new HighlightDisplaySystem(sceneContainer.overlayContainer, boardSize, tileSize, gameState)).withPriority(SystemPriorities.DISPLAY);
 			highlightingState.addInstance(new HighlightingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
@@ -222,8 +166,8 @@ package drop.board
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(creditsTextField, pendingCreditsTextField, gameState), SystemPriorities.DISPLAY);
-			engine.addSystem(new DisplaySystem(boardContainer, tileSize), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new DisplaySystem(sceneContainer.boardContainer, tileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");
 
@@ -244,7 +188,7 @@ package drop.board
 						var position : Point = touch.getLocation(event.target as DisplayObject);
 						if (dragStartPositionY == -1)
 						{
-							if (boardContainer.y == boardPosition.y)
+							if (sceneContainer.boardContainer.y == sceneContainer.boardPosition.y)
 							{
 								dragStartPositionY = position.y;
 							}
@@ -255,29 +199,29 @@ package drop.board
 						}
 						else
 						{
-							boardContainer.y = position.y - dragStartPositionY;
-							boardContainer.y = MathUtils.max(boardContainer.y, boardPosition.y);
-							boardContainer.y = MathUtils.min(boardContainer.y, boardPosition.y + tileSize);
+							sceneContainer.boardContainer.y = position.y - dragStartPositionY;
+							sceneContainer.boardContainer.y = MathUtils.max(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y);
+							sceneContainer.boardContainer.y = MathUtils.min(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y + tileSize);
 						}
 					}
 					else if (touch.phase == TouchPhase.ENDED)
 					{
-						if (boardContainer.y < boardPosition.y + tileSize / 2)
+						if (sceneContainer.boardContainer.y < sceneContainer.boardPosition.y + tileSize / 2)
 						{
-							boardContainer.y = boardPosition.y;
+							sceneContainer.boardContainer.y = sceneContainer.boardPosition.y;
 						}
 						else
 						{
-							boardContainer.y = boardPosition.y + tileSize;
+							sceneContainer.boardContainer.y = sceneContainer.boardPosition.y + tileSize;
 						}
 
 						dragStartPositionY = -1;
 					}
 
-					touchQuad.touchable = boardContainer.y == boardPosition.y;
-					boardContainer.alpha = MathUtils.min(1, (1 - Math.abs(boardPosition.y - boardContainer.y) / tileSize) + 0.1);
-					spawnerButtonsContainer.alpha = 1 - boardContainer.alpha;
-					spawnerButtonsContainer.y = boardContainer.y - tileSize;
+					sceneContainer.touchQuad.touchable = sceneContainer.boardContainer.y == sceneContainer.boardPosition.y;
+					sceneContainer.boardContainer.alpha = MathUtils.min(1, (1 - Math.abs(sceneContainer.boardPosition.y - sceneContainer.boardContainer.y) / tileSize) + 0.1);
+					sceneContainer.spawnerButtonsContainer.alpha = 1 - sceneContainer.boardContainer.alpha;
+					sceneContainer.spawnerButtonsContainer.y = sceneContainer.boardContainer.y - tileSize;
 				}
 			}
 		}
