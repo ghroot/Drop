@@ -40,18 +40,12 @@ package drop.board
 	import starling.core.Starling;
 	import starling.display.Button;
 	import starling.display.DisplayObject;
-	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
-	import starling.text.TextField;
-	import starling.textures.RenderTexture;
 	import starling.utils.AssetManager;
-	import starling.utils.Color;
-	import starling.utils.HAlign;
-	import starling.utils.VAlign;
 
 	public class Board extends Sprite
 	{
@@ -241,15 +235,7 @@ package drop.board
 
 						spawnerNode.spawnerComponent.spawnerLevel.level++;
 
-						var renderTexture : RenderTexture = new RenderTexture(tileSize, tileSize - 2);
-						var buttonQuad : Quad = new Quad(tileSize - 2, tileSize - 2, Color.BLACK);
-						buttonQuad.x = buttonQuad.y = 1;
-						renderTexture.draw(buttonQuad);
-						var spawnerLevelTextField : TextField = new TextField(tileSize, tileSize, spawnerNode.spawnerComponent.spawnerLevel.level.toString(), "fontSmall", 20, Color.WHITE);
-						spawnerLevelTextField.hAlign = HAlign.CENTER;
-						spawnerLevelTextField.vAlign = VAlign.CENTER;
-						renderTexture.draw(spawnerLevelTextField);
-						spawnerButton.upState = spawnerButton.downState = renderTexture;
+						spawnerButton.text = spawnerNode.spawnerComponent.spawnerLevel.level.toString();
 					}
 				}
 			}
