@@ -182,7 +182,7 @@ package drop.board
 						var position : Point = touch.getLocation(event.target as DisplayObject);
 						if (dragStartPositionY == -1)
 						{
-							if (sceneContainer.gameContainer.y == sceneContainer.boardPosition.y)
+							if (sceneContainer.boardContainer.y == sceneContainer.boardPosition.y)
 							{
 								dragStartPositionY = position.y;
 							}
@@ -193,29 +193,29 @@ package drop.board
 						}
 						else
 						{
-							sceneContainer.gameContainer.y = position.y - dragStartPositionY;
-							sceneContainer.gameContainer.y = MathUtils.max(sceneContainer.gameContainer.y, sceneContainer.boardPosition.y);
-							sceneContainer.gameContainer.y = MathUtils.min(sceneContainer.gameContainer.y, sceneContainer.boardPosition.y + tileSize);
+							sceneContainer.boardContainer.y = position.y - dragStartPositionY;
+							sceneContainer.boardContainer.y = MathUtils.max(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y);
+							sceneContainer.boardContainer.y = MathUtils.min(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y + tileSize);
 						}
 					}
 					else if (touch.phase == TouchPhase.ENDED)
 					{
-						if (sceneContainer.gameContainer.y < sceneContainer.boardPosition.y + tileSize / 2)
+						if (sceneContainer.boardContainer.y < sceneContainer.boardPosition.y + tileSize / 2)
 						{
-							sceneContainer.gameContainer.y = sceneContainer.boardPosition.y;
+							sceneContainer.boardContainer.y = sceneContainer.boardPosition.y;
 						}
 						else
 						{
-							sceneContainer.gameContainer.y = sceneContainer.boardPosition.y + tileSize;
+							sceneContainer.boardContainer.y = sceneContainer.boardPosition.y + tileSize;
 						}
 
 						dragStartPositionY = -1;
 					}
 
-					sceneContainer.touchQuad.touchable = sceneContainer.gameContainer.y == sceneContainer.boardPosition.y;
-					sceneContainer.gameContainer.alpha = MathUtils.min(1, (1 - Math.abs(sceneContainer.boardPosition.y - sceneContainer.gameContainer.y) / tileSize) + 0.1);
-					sceneContainer.spawnerButtonsContainer.alpha = 1 - sceneContainer.gameContainer.alpha;
-					sceneContainer.spawnerButtonsContainer.y = sceneContainer.gameContainer.y - tileSize;
+					sceneContainer.touchQuad.touchable = sceneContainer.boardContainer.y == sceneContainer.boardPosition.y;
+					sceneContainer.boardContainer.alpha = MathUtils.min(1, (1 - Math.abs(sceneContainer.boardPosition.y - sceneContainer.boardContainer.y) / tileSize) + 0.1);
+					sceneContainer.spawnerButtonsContainer.alpha = 1 - sceneContainer.boardContainer.alpha;
+					sceneContainer.spawnerButtonsContainer.y = sceneContainer.boardContainer.y - tileSize;
 				}
 			}
 		}
