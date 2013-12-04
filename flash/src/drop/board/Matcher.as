@@ -2,6 +2,7 @@ package drop.board
 {
 	import ash.core.NodeList;
 
+	import drop.data.Directions;
 	import drop.node.MatchNode;
 
 	import flash.geom.Point;
@@ -53,6 +54,105 @@ package drop.board
 				}
 			}
 			return matches;
+		}
+
+		public function hasPossibleMatches(matchNodeList : NodeList) : Boolean
+		{
+			updateMatchNodesByPosition(matchNodeList);
+
+			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
+			{
+				var matchNodeLeft : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x - tileSize, matchNode.transformComponent.y);
+				if (matchNodeLeft != null &&
+						matchNodeLeft.matchComponent.type == matchNode.matchComponent.type)
+				{
+					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x - 2 * tileSize, matchNode.transformComponent.y, Directions.RIGHT) ||
+							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x + tileSize, matchNode.transformComponent.y, Directions.LEFT))
+					{
+						return true;
+					}
+				}
+
+				var matchNodeRight : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x + tileSize, matchNode.transformComponent.y);
+				if (matchNodeRight != null &&
+						matchNodeRight.matchComponent.type == matchNode.matchComponent.type)
+				{
+					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x - tileSize, matchNode.transformComponent.y, Directions.LEFT) ||
+							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x + 2 * tileSize, matchNode.transformComponent.y, Directions.RIGHT))
+					{
+						return true;
+					}
+				}
+
+				var matchNodeUp : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x, matchNode.transformComponent.y - tileSize);
+				if (matchNodeUp != null &&
+						matchNodeUp.matchComponent.type == matchNode.matchComponent.type)
+				{
+					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y - 2 * tileSize, Directions.DOWN) ||
+							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y + tileSize, Directions.UP))
+					{
+						return true;
+					}
+				}
+
+				var matchNodeDown : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x, matchNode.transformComponent.y + tileSize);
+				if (matchNodeDown != null &&
+						matchNodeDown.matchComponent.type == matchNode.matchComponent.type)
+				{
+					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y - tileSize, Directions.UP) ||
+							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y + 2 * tileSize, Directions.DOWN))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private function canMatchNodeWithTypeBeMovedIntoPosition(type : int, positionX : Number, positionY : Number, exceptDirection : int) : Boolean
+		{
+			if (exceptDirection != Directions.LEFT)
+			{
+				var matchNodeLeft : MatchNode = getMatchNodeAtPosition(positionX - tileSize, positionY);
+				if (matchNodeLeft != null &&
+						matchNodeLeft.matchComponent.type == type)
+				{
+					return true;
+				}
+			}
+
+			if (exceptDirection != Directions.RIGHT)
+			{
+				var matchNodeRight : MatchNode = getMatchNodeAtPosition(positionX + tileSize, positionY);
+				if (matchNodeRight != null &&
+						matchNodeRight.matchComponent.type == type)
+				{
+					return true;
+				}
+			}
+
+			if (exceptDirection != Directions.UP)
+			{
+				var matchNodeUp : MatchNode = getMatchNodeAtPosition(positionX, positionY - tileSize);
+				if (matchNodeUp != null &&
+						matchNodeUp.matchComponent.type == type)
+				{
+					return true;
+				}
+			}
+
+			if (exceptDirection != Directions.DOWN)
+			{
+				var matchNodeDown : MatchNode = getMatchNodeAtPosition(positionX, positionY + tileSize);
+				if (matchNodeDown != null &&
+						matchNodeDown.matchComponent.type == type)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private function getMatchThatSharesMatchNode(match : Match, matches : Vector.<Match>) : Match
@@ -196,12 +296,14 @@ package drop.board
 			}
 		}
 
-		private function getMatchNodeAtPosition(positionX : Number, positionY : Number) : MatchNode
+		[Inline]
+		private final function getMatchNodeAtPosition(positionX : Number, positionY : Number) : MatchNode
 		{
 			return matchNodesByPosition[getKey(positionX, positionY)];
 		}
 
-		private function getKey(positionX : Number, positionY : Number) : int
+		[Inline]
+		private final function getKey(positionX : Number, positionY : Number) : int
 		{
 			return positionY * boardSize.x + positionX;
 		}

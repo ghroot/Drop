@@ -155,7 +155,7 @@ package drop.board
 			var turnEndState : EngineState = stateMachine.createState("turnEnd");
 			turnEndState.addInstance(new ComboSystem(gameState, gameRules)).withPriority(SystemPriorities.PRE_LOGIC);
 			turnEndState.addInstance(new AddPendingCreditsSystem(gameRules)).withPriority(SystemPriorities.LOGIC);
-			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
+			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine, matcher, entityManager)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
