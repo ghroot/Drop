@@ -246,13 +246,21 @@ package drop.board
 			switch (spawnerNode.spawnerComponent.spawnerLevel.level)
 			{
 				case 1:
+				{
 					return 100;
+				}
 				case 2:
+				{
 					return 1000;
+				}
 				case 3:
+				{
 					return 5000;
+				}
 				default:
+				{
 					return 0;
+				}
 			}
 		}
 	}
