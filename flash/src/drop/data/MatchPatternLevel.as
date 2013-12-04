@@ -27,7 +27,7 @@ package drop.data
 
 		public function getNumberOfBonusCredits() : int
 		{
-			return getLevel() - 1;
+			return (getLevel() - 1) * 3;
 		}
 
 		public function getRequiredPointsForNextLevel() : int
