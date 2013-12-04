@@ -23,13 +23,17 @@ package drop.scene
 		private var tileSize : int;
 
 		public var boardPosition : Point;
-		public var boardContainer : Sprite;
-		public var touchQuad : Quad;
+
 		public var spawnerButtonsContainer : Sprite;
 		public var spawnerButtons : Vector.<Button>;
+
+		public var gameContainer : Sprite;
+		public var touchQuad : Quad;
+		public var boardContainer : Sprite;
 		public var overlayContainer : Sprite;
 		public var creditsTextField : TextField;
 		public var pendingCreditsTextField : TextField;
+
 		public var bottomTouchQuad : Quad;
 
 		public function SceneContainer(assets : AssetManager, boardSize : Point, tileSize : int)
@@ -53,19 +57,6 @@ package drop.scene
 			backgroundImage.blendMode = BlendMode.NONE;
 			addChild(backgroundImage);
 
-			touchQuad = new Quad(boardSize.x * tileSize, boardSize.y * tileSize);
-			touchQuad.x = boardPosition.x;
-			touchQuad.y = boardPosition.y;
-			touchQuad.alpha = 0;
-			touchQuad.blendMode = BlendMode.NONE;
-			addChild(touchQuad);
-
-			boardContainer = new Sprite();
-			boardContainer.x = boardPosition.x;
-			boardContainer.y = boardPosition.y;
-			boardContainer.touchable = false;
-			addChild(boardContainer);
-
 			spawnerButtons = new Vector.<Button>();
 			spawnerButtonsContainer = new Sprite();
 			spawnerButtonsContainer.x = boardPosition.x;
@@ -83,11 +74,27 @@ package drop.scene
 			spawnerButtonsContainer.alpha = 0;
 			addChild(spawnerButtonsContainer);
 
+			gameContainer = new Sprite();
+			addChild(gameContainer);
+
+			touchQuad = new Quad(boardSize.x * tileSize, boardSize.y * tileSize);
+			touchQuad.x = boardPosition.x;
+			touchQuad.y = boardPosition.y;
+			touchQuad.alpha = 0;
+			touchQuad.blendMode = BlendMode.NONE;
+			gameContainer.addChild(touchQuad);
+
+			boardContainer = new Sprite();
+			boardContainer.x = boardPosition.x;
+			boardContainer.y = boardPosition.y;
+			boardContainer.touchable = false;
+			gameContainer.addChild(boardContainer);
+
 			overlayContainer = new Sprite();
 			overlayContainer.x = boardPosition.x;
 			overlayContainer.y = boardPosition.y;
 			overlayContainer.touchable = false;
-			addChild(overlayContainer);
+			gameContainer.addChild(overlayContainer);
 
 			creditsTextField = new TextField(stage.stageWidth, 70, "0", "font", 60)
 			creditsTextField.hAlign = HAlign.CENTER;
@@ -96,14 +103,14 @@ package drop.scene
 			creditsTextField.x = stage.stageWidth / 2;
 			creditsTextField.y = boardPosition.y + boardSize.y * tileSize + (stage.stageHeight - boardSize.y * tileSize - boardPosition.y) / 2;
 			creditsTextField.touchable = false;
-			addChild(creditsTextField);
+			gameContainer.addChild(creditsTextField);
 
 			pendingCreditsTextField = new TextField(stage.stageWidth, 30, "0", "fontSmall", 20);
 			pendingCreditsTextField.hAlign = HAlign.CENTER;
 			pendingCreditsTextField.vAlign = VAlign.TOP;
 			pendingCreditsTextField.y = creditsTextField.y + 26;
 			pendingCreditsTextField.touchable = false;
-			addChild(pendingCreditsTextField);
+			gameContainer.addChild(pendingCreditsTextField);
 
 			bottomTouchQuad = new Quad(stage.stageWidth, stage.stageHeight - boardSize.y * tileSize - boardPosition.y);
 			bottomTouchQuad.y = boardPosition.y + boardSize.y * tileSize + boardPosition.y;
