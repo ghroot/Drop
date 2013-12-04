@@ -71,7 +71,7 @@ package drop.board
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
 			setupSize();
-			setupUi();
+			setupScene();
 			createWorld();
 		}
 
@@ -81,7 +81,7 @@ package drop.board
 			tileSize = 44;
 		}
 
-		private function setupUi() : void
+		private function setupScene() : void
 		{
 			sceneContainer = new SceneContainer(assets, boardSize, tileSize);
 			addChild(sceneContainer);
