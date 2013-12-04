@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
-<!-- $TexturePacker:SmartUpdate:06c1e919bf74d4e5eddc06586a1a3226:2f003811665e6de7c4d0551fe913914e:d8ee52167869d148a52a8627be0cb789$ -->
+<!-- $TexturePacker:SmartUpdate:e2873b17c0320845e909ca5e1b64e39c:8c383d903803dd764c06e222acda29a6:d8ee52167869d148a52a8627be0cb789$ -->
 <TextureAtlas imagePath="spritesheeth.png">
-    <SubTexture name="spawner" x="92" y="182" width="86" height="86" frameX="-1" frameY="-1" frameWidth="88" frameHeight="88"/>
-    <SubTexture name="tile_1" x="2" y="182" width="88" height="88"/>
-    <SubTexture name="tile_2" x="92" y="92" width="88" height="88"/>
-    <SubTexture name="tile_3" x="2" y="92" width="88" height="88"/>
-    <SubTexture name="tile_4" x="92" y="2" width="88" height="88"/>
+    <SubTexture name="lineblast_1" x="2" y="902" width="88" height="88"/>
+    <SubTexture name="lineblast_2" x="2" y="812" width="88" height="88"/>
+    <SubTexture name="lineblast_3" x="2" y="722" width="88" height="88"/>
+    <SubTexture name="lineblast_4" x="2" y="632" width="88" height="88"/>
+    <SubTexture name="lineblast_5" x="2" y="542" width="88" height="88"/>
+    <SubTexture name="spawner" x="2" y="452" width="88" height="88"/>
+    <SubTexture name="tile_1" x="2" y="362" width="88" height="88"/>
+    <SubTexture name="tile_2" x="2" y="272" width="88" height="88"/>
+    <SubTexture name="tile_3" x="2" y="182" width="88" height="88"/>
+    <SubTexture name="tile_4" x="2" y="92" width="88" height="88"/>
     <SubTexture name="tile_5" x="2" y="2" width="88" height="88"/>
 </TextureAtlas>

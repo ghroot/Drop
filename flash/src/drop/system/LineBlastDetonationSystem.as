@@ -50,7 +50,7 @@ package drop.system
 				{
 					var matchComponent : MatchComponent = lineBlastNode.entity.get(MatchComponent);
 					engine.addEntity(entityManager.createLineBlastPulse(lineBlastNode.transformComponent.x,
-							lineBlastNode.transformComponent.y, matchComponent.color));
+							lineBlastNode.transformComponent.y, matchComponent.type));
 
 					lineBlastCenterX = lineBlastNode.transformComponent.x + tileSize / 2;
 					lineBlastCenterY = lineBlastNode.transformComponent.y + tileSize / 2;

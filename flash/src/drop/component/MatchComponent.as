@@ -4,7 +4,7 @@ package drop.component
 
 	public class MatchComponent
 	{
-		public var color : int;
+		public var type : int;
 
 		public static function create() : MatchComponent
 		{
@@ -15,12 +15,12 @@ package drop.component
 
 		public function reset() : void
 		{
-			color = 0;
+			type = 0;
 		}
 
-		public function withColor(value : int) : MatchComponent
+		public function withType(value : int) : MatchComponent
 		{
-			color = value;
+			type = value;
 			return this;
 		}
 	}

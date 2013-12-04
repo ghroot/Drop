@@ -111,7 +111,7 @@ package drop.board
 			{
 				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodeList, currentX, matchNode.transformComponent.y);
 				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
 					currentX -= tileSize;
@@ -126,7 +126,7 @@ package drop.board
 			{
 				matchNodeAtPosition = getMatchNodeAtPosition(matchNodeList, currentX, matchNode.transformComponent.y);
 				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
 					currentX += tileSize;
@@ -154,7 +154,7 @@ package drop.board
 			{
 				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNodeList, matchNode.transformComponent.x, currentY);
 				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
 					currentY -= tileSize;
@@ -169,7 +169,7 @@ package drop.board
 			{
 				matchNodeAtPosition = getMatchNodeAtPosition(matchNodeList, matchNode.transformComponent.x, currentY);
 				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.color == matchNode.matchComponent.color)
+						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
 					currentY += tileSize;

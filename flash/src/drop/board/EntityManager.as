@@ -26,6 +26,7 @@ package drop.board
 	import drop.util.DisplayUtils;
 
 	import flash.geom.Point;
+	import flash.utils.Dictionary;
 
 	import starling.animation.Tween;
 	import starling.display.Image;
@@ -35,6 +36,15 @@ package drop.board
 
 	public class EntityManager
 	{
+		private static const TYPE_TO_COLOR_MAPPING : Dictionary = new Dictionary();
+		{
+			TYPE_TO_COLOR_MAPPING[1] = 0x009ece;
+			TYPE_TO_COLOR_MAPPING[2] = 0xff9e00;
+			TYPE_TO_COLOR_MAPPING[3] = 0xf7d708;
+			TYPE_TO_COLOR_MAPPING[4] = 0xce0000;
+			TYPE_TO_COLOR_MAPPING[5] = 0x9ccf31;
+		}
+
 		private var engine : Engine;
 		private var assets : AssetManager;
 		private var boardSize : Point;
@@ -54,8 +64,8 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var color : int = 1 + Math.floor(Math.random() * 5);
-			var image : Image = new Image(assets.getTexture("tile_" + color));
+			var type : int = 1 + Math.floor(Math.random() * 5);
+			var image : Image = new Image(assets.getTexture("tile_" + type));
 			DisplayUtils.centerPivot(image);
 			image.touchable = false;
 
@@ -107,7 +117,7 @@ package drop.board
 
 			entity.add(transformComponent);
 			entity.add(BlockComponent.create());
-			entity.add(MatchComponent.create().withColor(color));
+			entity.add(MatchComponent.create().withType(type));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
 			stateMachine.changeState("idle");
@@ -121,8 +131,8 @@ package drop.board
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var color : int = 1 + Math.floor(Math.random() * 5);
-			var image : Image = new Image(assets.getTexture("tile_" + color));
+			var type : int = 1 + Math.floor(Math.random() * 5);
+			var image : Image = new Image(assets.getTexture("lineblast_" + type));
 			DisplayUtils.centerPivot(image);
 			image.touchable = false;
 
@@ -185,7 +195,7 @@ package drop.board
 
 			entity.add(transformComponent);
 			entity.add(BlockComponent.create());
-			entity.add(MatchComponent.create().withColor(color));
+			entity.add(MatchComponent.create().withType(type));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
 
 			stateMachine.changeState("idle");
@@ -193,9 +203,11 @@ package drop.board
 			return entity;
 		}
 
-		public function createLineBlastPulse(x : Number, y : Number, color : int) : Entity
+		public function createLineBlastPulse(x : Number, y : Number, type : int) : Entity
 		{
 			var entity : Entity = new Entity();
+
+			var color : int = TYPE_TO_COLOR_MAPPING[type];
 
 			var fadedHorizontalQuad : Quad = new Quad(boardSize.x * tileSize, 14, color);
 			fadedHorizontalQuad.alpha = 0.2;
@@ -260,8 +272,6 @@ package drop.board
 		public function createInvisibleBlocker(x : Number, y : Number, duration : Number) : Entity
 		{
 			var entity : Entity = new Entity();
-
-			entity.name = "invisibleBlocker" + Math.random();
 
 			entity.add(BlockComponent.create());
 			entity.add(CountdownComponent.create().withTime(duration));
