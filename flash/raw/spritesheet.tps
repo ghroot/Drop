@@ -53,7 +53,7 @@
         <key>dataFormat</key>
         <string>sparrow</string>
         <key>textureFileName</key>
-        <filename>../res/{v}/spritesheeth.png</filename>
+        <filename>../res/{v}/spritesheet.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>ditherType</key>
