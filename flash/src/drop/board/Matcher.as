@@ -73,7 +73,7 @@ package drop.board
 			return null;
 		}
 
-		public function getMatch(matchNode : MatchNode) : Match
+		private function getMatch(matchNode : MatchNode) : Match
 		{
 			reusableMatchedMatchNodes.length = 0;
 
