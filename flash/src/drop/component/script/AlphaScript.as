@@ -1,9 +1,10 @@
 package drop.component.script
 {
 	import drop.component.DisplayComponent;
-	import drop.component.TransformComponent;
+	import drop.component.DisplayComponentContainer;
 
 	import starling.animation.Tween;
+	import starling.core.Starling;
 
 	public class AlphaScript extends Script
 	{
@@ -11,8 +12,6 @@ package drop.component.script
 		private var alpha : Number;
 		private var tweenDuration : Number;
 		private var resetOnEnd : Boolean;
-
-		private var tween : Tween;
 
 		public function AlphaScript(displayComponent : DisplayComponent, alpha : Number, tweenDuration : Number = 0, resetOnEnd : Boolean = false)
 		{
@@ -26,30 +25,32 @@ package drop.component.script
 		{
 			if (tweenDuration == 0)
 			{
-				displayComponent.displayComponentContainer.alpha = alpha;
+				for each (var displayComponentContainer : DisplayComponentContainer in displayComponent.displayComponentContainers)
+				{
+					displayComponentContainer.alpha = alpha;
+				}
 			}
 			else
 			{
-				tween = new Tween(displayComponent.displayComponentContainer, tweenDuration);
-				tween.animate("alpha", alpha);
-			}
-		}
-
-		override public function update(time : Number) : void
-		{
-			if (tween != null)
-			{
-				tween.advanceTime(time);
+				for each (displayComponentContainer in displayComponent.displayComponentContainers)
+				{
+					var tween : Tween = new Tween(displayComponentContainer, tweenDuration);
+					tween.animate("alpha", alpha);
+					Starling.juggler.add(tween);
+				}
 			}
 		}
 
 		override public function end() : void
 		{
-			if (resetOnEnd)
+			for each (var displayComponentContainer : DisplayComponentContainer in displayComponent.displayComponentContainers)
 			{
-				displayComponent.displayComponentContainer.alpha = 1;
+				if (resetOnEnd)
+				{
+					displayComponentContainer.alpha = 1;
+				}
+				Starling.juggler.removeTweens(displayComponentContainer);
 			}
-			tween = null;
 		}
 	}
 }

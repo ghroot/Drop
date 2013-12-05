@@ -72,7 +72,7 @@ package drop.board
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
 			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image);
-			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image).withZ(ZOrder.TOP);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image, ZOrder.TOP);
 
 			var idleState : EntityState = stateMachine.createState("idle");
 			idleState.add(LineBlastTargetComponent).withInstance(LineBlastTargetComponent.create());
@@ -106,8 +106,8 @@ package drop.board
 			fadedDoneState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(1).withStateToChangeTo("idle"));
 
 			var matchedState : EntityState = stateMachine.createState("matched");
-			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.4)));
 			matchedState.add(DisplayComponent).withInstance(displayComponent);
+			matchedState.add(ScriptComponent).withInstance(ScriptComponent.create().withScript(new ScaleScript(transformComponent, 0, 0.4)));
 			matchedState.add(CountdownComponent).withInstance(CountdownComponent.create().withTime(0.4));
 
 			var destroyedByLineBlastState : EntityState = stateMachine.createState("destroyedByLineBlast");
@@ -139,7 +139,7 @@ package drop.board
 			var transformComponent : TransformComponent = TransformComponent.create().withX(x).withY(y);
 			var selectComponent : SelectComponent = SelectComponent.create();
 			var displayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image);
-			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image).withZ(ZOrder.TOP);
+			var highlightDisplayComponent : DisplayComponent = DisplayComponent.create().withDisplayObject(image, ZOrder.TOP);
 			var triggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create().withIsTriggered(true);
 			var nonTriggeredLineBlastComponent : LineBlastComponent = LineBlastComponent.create();
 

@@ -1,6 +1,7 @@
 package drop.component.script
 {
 	import starling.animation.Tween;
+	import starling.core.Starling;
 
 	public class TweenScript extends Script
 	{
@@ -11,14 +12,14 @@ package drop.component.script
 			this.tween = tween;
 		}
 
-		override public function update(time : Number) : void
+		override public function start() : void
 		{
-			tween.advanceTime(time);
+			Starling.juggler.add(tween);
 		}
 
 		override public function end() : void
 		{
-			tween = null;
+			Starling.juggler.remove(tween);
 		}
 	}
 }

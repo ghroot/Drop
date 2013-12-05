@@ -8,7 +8,12 @@ package drop.component
 
 	public class DisplayComponent
 	{
-		public var displayComponentContainer : DisplayComponentContainer;
+		public var displayComponentContainers : Vector.<DisplayComponentContainer>;
+
+		public function DisplayComponent()
+		{
+			displayComponentContainers = new Vector.<DisplayComponentContainer>();
+		}
 
 		public static function create() : DisplayComponent
 		{
@@ -19,18 +24,12 @@ package drop.component
 
 		public function reset() : void
 		{
-			displayComponentContainer = null;
+			displayComponentContainers.length = 0;
 		}
 
-		public function withDisplayObject(value : DisplayObject) : DisplayComponent
+		public function withDisplayObject(value : DisplayObject, z : int = ZOrder.MIDDLE) : DisplayComponent
 		{
-			displayComponentContainer = new DisplayComponentContainer(value, ZOrder.MIDDLE);
-			return this;
-		}
-
-		public function withZ(value : int) : DisplayComponent
-		{
-			displayComponentContainer.z = value;
+			displayComponentContainers[displayComponentContainers.length] = new DisplayComponentContainer(value, z);
 			return this;
 		}
 	}

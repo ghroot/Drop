@@ -51,8 +51,12 @@ package drop.system
 		{
 			updateTransform(displayNode);
 
-			displayNode.displayComponent.displayComponentContainer.addChild(displayNode.displayComponent.displayComponentContainer.displayObject);
-			displayObjectContainer.addChild(displayNode.displayComponent.displayComponentContainer);
+			for each (var displayComponentContainer : DisplayComponentContainer in displayNode.displayComponent.displayComponentContainers)
+			{
+				displayComponentContainer.addChild(displayComponentContainer.displayObject);
+				displayObjectContainer.addChild(displayComponentContainer);
+			}
+
 			displayObjectContainer.sortChildren(compareDisplayObjectsByZ);
 		}
 
@@ -74,16 +78,15 @@ package drop.system
 
 		private function removeFromDisplayObjectContainer(displayNode : DisplayNode) : void
 		{
-			displayObjectContainer.removeChild(displayNode.displayComponent.displayComponentContainer);
+			for each (var displayComponentContainer : DisplayComponentContainer in displayNode.displayComponent.displayComponentContainers)
+			{
+				displayObjectContainer.removeChild(displayComponentContainer);
+			}
 		}
 
-		private function updateTransform(displayNode : DisplayNode) : void
-		{
-			displayNode.displayComponent.displayComponentContainer.x = int(displayNode.transformComponent.x + tileSize / 2);
-			displayNode.displayComponent.displayComponentContainer.y = int(displayNode.transformComponent.y + tileSize / 2);
-			displayNode.displayComponent.displayComponentContainer.scaleX = displayNode.transformComponent.scale;
-			displayNode.displayComponent.displayComponentContainer.scaleY = displayNode.transformComponent.scale;
-		}
+
+
+
 
 		override public function update(time : Number) : void
 		{
@@ -92,10 +95,30 @@ package drop.system
 			for (var displayNode : DisplayNode = displayNodeList.head; displayNode; displayNode = displayNode.next)
 			{
 				updateTransform(displayNode);
+				updateAnimation(displayNode, time);
+			}
+		}
 
-				if (displayNode.displayComponent.displayComponentContainer.displayObject is IAnimatable)
+		[Inline]
+		private final function updateTransform(displayNode : DisplayNode) : void
+		{
+			for each (var displayComponentContainer : DisplayComponentContainer in displayNode.displayComponent.displayComponentContainers)
+			{
+				displayComponentContainer.x = int(displayNode.transformComponent.x + tileSize / 2);
+				displayComponentContainer.y = int(displayNode.transformComponent.y + tileSize / 2);
+				displayComponentContainer.scaleX = displayNode.transformComponent.scale;
+				displayComponentContainer.scaleY = displayNode.transformComponent.scale;
+			}
+		}
+
+		[Inline]
+		private final function updateAnimation(displayNode : DisplayNode, time : Number) : void
+		{
+			for each (var displayComponentContainer : DisplayComponentContainer in displayNode.displayComponent.displayComponentContainers)
+			{
+				if (displayComponentContainer.displayObject is IAnimatable)
 				{
-					IAnimatable(displayNode.displayComponent.displayComponentContainer.displayObject).advanceTime(time);
+					IAnimatable(displayComponentContainer.displayObject).advanceTime(time);
 				}
 			}
 		}
