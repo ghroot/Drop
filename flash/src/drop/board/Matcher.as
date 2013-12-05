@@ -2,6 +2,7 @@ package drop.board
 {
 	import ash.core.NodeList;
 
+	import drop.data.Axis;
 	import drop.data.Directions;
 	import drop.node.MatchNode;
 
@@ -15,6 +16,8 @@ package drop.board
 		private var boardSize : Point;
 		private var tileSize : int;
 
+		private var offsetsForDirections : Vector.<Point>;
+
 		private var matchNodesByPosition : Dictionary;
 		private var reusableMatchedMatchNodes : Vector.<MatchNode>;
 		private var reusableHorizontalOrVerticalMatchingNodes : Vector.<MatchNode>;
@@ -23,6 +26,19 @@ package drop.board
 		{
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
+
+			offsetsForDirections = new <Point>
+			[
+				new Point(0, 0),
+				new Point(-tileSize, 0),
+				new Point(-tileSize, -tileSize),
+				new Point(0, -tileSize),
+				new Point(tileSize, -tileSize),
+				new Point(tileSize, 0),
+				new Point(tileSize, tileSize),
+				new Point(0, tileSize),
+				new Point(-tileSize, tileSize)
+			];
 
 			reusableMatchedMatchNodes = new Vector.<MatchNode>();
 			reusableHorizontalOrVerticalMatchingNodes = new Vector.<MatchNode>();
@@ -56,105 +72,6 @@ package drop.board
 			return matches;
 		}
 
-		public function hasPossibleMatches(matchNodeList : NodeList) : Boolean
-		{
-			updateMatchNodesByPosition(matchNodeList);
-
-			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
-			{
-				var matchNodeLeft : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x - tileSize, matchNode.transformComponent.y);
-				if (matchNodeLeft != null &&
-						matchNodeLeft.matchComponent.type == matchNode.matchComponent.type)
-				{
-					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x - 2 * tileSize, matchNode.transformComponent.y, Directions.RIGHT) ||
-							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x + tileSize, matchNode.transformComponent.y, Directions.LEFT))
-					{
-						return true;
-					}
-				}
-
-				var matchNodeRight : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x + tileSize, matchNode.transformComponent.y);
-				if (matchNodeRight != null &&
-						matchNodeRight.matchComponent.type == matchNode.matchComponent.type)
-				{
-					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x - tileSize, matchNode.transformComponent.y, Directions.LEFT) ||
-							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x + 2 * tileSize, matchNode.transformComponent.y, Directions.RIGHT))
-					{
-						return true;
-					}
-				}
-
-				var matchNodeUp : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x, matchNode.transformComponent.y - tileSize);
-				if (matchNodeUp != null &&
-						matchNodeUp.matchComponent.type == matchNode.matchComponent.type)
-				{
-					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y - 2 * tileSize, Directions.DOWN) ||
-							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y + tileSize, Directions.UP))
-					{
-						return true;
-					}
-				}
-
-				var matchNodeDown : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x, matchNode.transformComponent.y + tileSize);
-				if (matchNodeDown != null &&
-						matchNodeDown.matchComponent.type == matchNode.matchComponent.type)
-				{
-					if (canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y - tileSize, Directions.UP) ||
-							canMatchNodeWithTypeBeMovedIntoPosition(matchNode.matchComponent.type, matchNode.transformComponent.x, matchNode.transformComponent.y + 2 * tileSize, Directions.DOWN))
-					{
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-
-		private function canMatchNodeWithTypeBeMovedIntoPosition(type : int, positionX : Number, positionY : Number, exceptDirection : int) : Boolean
-		{
-			if (exceptDirection != Directions.LEFT)
-			{
-				var matchNodeLeft : MatchNode = getMatchNodeAtPosition(positionX - tileSize, positionY);
-				if (matchNodeLeft != null &&
-						matchNodeLeft.matchComponent.type == type)
-				{
-					return true;
-				}
-			}
-
-			if (exceptDirection != Directions.RIGHT)
-			{
-				var matchNodeRight : MatchNode = getMatchNodeAtPosition(positionX + tileSize, positionY);
-				if (matchNodeRight != null &&
-						matchNodeRight.matchComponent.type == type)
-				{
-					return true;
-				}
-			}
-
-			if (exceptDirection != Directions.UP)
-			{
-				var matchNodeUp : MatchNode = getMatchNodeAtPosition(positionX, positionY - tileSize);
-				if (matchNodeUp != null &&
-						matchNodeUp.matchComponent.type == type)
-				{
-					return true;
-				}
-			}
-
-			if (exceptDirection != Directions.DOWN)
-			{
-				var matchNodeDown : MatchNode = getMatchNodeAtPosition(positionX, positionY + tileSize);
-				if (matchNodeDown != null &&
-						matchNodeDown.matchComponent.type == type)
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
-
 		private function getMatchThatSharesMatchNode(match : Match, matches : Vector.<Match>) : Match
 		{
 			for each (var otherMatch : Match in matches)
@@ -179,13 +96,13 @@ package drop.board
 
 			reusableMatchedMatchNodes.push(matchNode);
 
-			var matchNodesInHorizontalMatch : Vector.<MatchNode> = getHorizontalMatchingNodes(matchNode);
+			var matchNodesInHorizontalMatch : Vector.<MatchNode> = getMatchingNodes(matchNode, Axis.HORIZONTAL);
 			for each (var matchNodeInHorizontalMatch : MatchNode in matchNodesInHorizontalMatch)
 			{
 				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInHorizontalMatch;
 			}
 
-			var matchNodesInVerticalMatch : Vector.<MatchNode> = getVerticalMatchingNodes(matchNode);
+			var matchNodesInVerticalMatch : Vector.<MatchNode> = getMatchingNodes(matchNode, Axis.VERTICAL);
 			for each (var matchNodeInVerticalMatch : MatchNode in matchNodesInVerticalMatch)
 			{
 				reusableMatchedMatchNodes[reusableMatchedMatchNodes.length] = matchNodeInVerticalMatch;
@@ -201,34 +118,40 @@ package drop.board
 			}
 		}
 
-		private function getHorizontalMatchingNodes(matchNode : MatchNode) : Vector.<MatchNode>
+		private function getMatchingNodes(matchNode : MatchNode, axis : int) : Vector.<MatchNode>
 		{
 			reusableHorizontalOrVerticalMatchingNodes.length = 0;
 
-			var currentX : Number = matchNode.transformComponent.x - tileSize;
-			while (currentX >= 0)
+			var minPosition : Number = 0;
+			var maxPosition : Number = (axis == Axis.HORIZONTAL ? boardSize.x : boardSize.y) * tileSize
+			var currentPosition : Number = axis == Axis.HORIZONTAL ? matchNode.transformComponent.x - tileSize : matchNode.transformComponent.y - tileSize;
+			while (currentPosition >= minPosition)
 			{
-				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(currentX, matchNode.transformComponent.y);
+				var matchNodeAtPosition : MatchNode = axis == Axis.HORIZONTAL ?
+						getMatchNodeAtPosition(currentPosition, matchNode.transformComponent.y) :
+						getMatchNodeAtPosition(matchNode.transformComponent.x, currentPosition);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
-					currentX -= tileSize;
+					currentPosition -= tileSize;
 				}
 				else
 				{
 					break;
 				}
 			}
-			currentX = matchNode.transformComponent.x + tileSize;
-			while (currentX < boardSize.x * tileSize)
+			currentPosition = axis == Axis.HORIZONTAL ? matchNode.transformComponent.x + tileSize : matchNode.transformComponent.y + tileSize;
+			while (currentPosition < maxPosition)
 			{
-				matchNodeAtPosition = getMatchNodeAtPosition(currentX, matchNode.transformComponent.y);
+				matchNodeAtPosition = axis == Axis.HORIZONTAL ?
+						getMatchNodeAtPosition(currentPosition, matchNode.transformComponent.y) :
+						getMatchNodeAtPosition(matchNode.transformComponent.x, currentPosition);
 				if (matchNodeAtPosition != null &&
 						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
 				{
 					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
-					currentX += tileSize;
+					currentPosition += tileSize;
 				}
 				else
 				{
@@ -244,47 +167,69 @@ package drop.board
 			return reusableHorizontalOrVerticalMatchingNodes;
 		}
 
-		private function getVerticalMatchingNodes(matchNode : MatchNode) : Vector.<MatchNode>
+		public function hasPossibleMatches(matchNodeList : NodeList) : Boolean
 		{
-			reusableHorizontalOrVerticalMatchingNodes.length = 0;
+			updateMatchNodesByPosition(matchNodeList);
 
-			var currentY : Number = matchNode.transformComponent.y - tileSize;
-			while (currentY >= 0)
+			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
 			{
-				var matchNodeAtPosition : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x, currentY);
-				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
+				for each (var direction : int in Directions.STRAIGHT_DIRECTIONS)
 				{
-					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
-					currentY -= tileSize;
-				}
-				else
-				{
-					break;
+					var matchNodeInDirection : MatchNode = getMatchNodeAtPosition(matchNode.transformComponent.x + offsetsForDirections[direction].x, matchNode.transformComponent.y + offsetsForDirections[direction].y);
+					if (matchNodeInDirection != null &&
+							matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+					{
+						var positionX : Number = matchNode.transformComponent.x + 2 * offsetsForDirections[direction].x;
+						var positionY : Number = matchNode.transformComponent.y + 2 * offsetsForDirections[direction].y;
+
+						matchNodeInDirection = getMatchNodeAtPosition(positionX + offsetsForDirections[direction].x, positionY + offsetsForDirections[direction].y);
+						if (matchNodeInDirection != null &&
+								matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+						{
+							return true;
+						}
+
+						var otherDirection : int = Directions.getNextDirection(Directions.getNextDirection(direction));
+						matchNodeInDirection = getMatchNodeAtPosition(positionX + offsetsForDirections[otherDirection].x, positionY + offsetsForDirections[otherDirection].y);
+						if (matchNodeInDirection != null &&
+								matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+						{
+							return true;
+						}
+
+						otherDirection = Directions.getPreviousDirection(Directions.getPreviousDirection(direction));
+						matchNodeInDirection = getMatchNodeAtPosition(positionX + offsetsForDirections[otherDirection].x, positionY + offsetsForDirections[otherDirection].y);
+						if (matchNodeInDirection != null &&
+								matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+						{
+							return true;
+						}
+					}
+
+					matchNodeInDirection = getMatchNodeAtPosition(matchNode.transformComponent.x + 2 * offsetsForDirections[direction].x, matchNode.transformComponent.y + 2 * offsetsForDirections[direction].y);
+					if (matchNodeInDirection != null &&
+							matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+					{
+						var diagonalDirection : int = Directions.getNextDirection(direction);
+						matchNodeInDirection = getMatchNodeAtPosition(matchNode.transformComponent.x + offsetsForDirections[diagonalDirection].x, matchNode.transformComponent.y + offsetsForDirections[diagonalDirection].y);
+						if (matchNodeInDirection != null &&
+								matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+						{
+							return true;
+						}
+
+						diagonalDirection = Directions.getPreviousDirection(direction);
+						matchNodeInDirection = getMatchNodeAtPosition(matchNode.transformComponent.x + offsetsForDirections[diagonalDirection].x, matchNode.transformComponent.y + offsetsForDirections[diagonalDirection].y);
+						if (matchNodeInDirection != null &&
+								matchNodeInDirection.matchComponent.type == matchNode.matchComponent.type)
+						{
+							return true;
+						}
+					}
 				}
 			}
-			currentY = matchNode.transformComponent.y + tileSize;
-			while (currentY < boardSize.y * tileSize)
-			{
-				matchNodeAtPosition = getMatchNodeAtPosition(matchNode.transformComponent.x, currentY);
-				if (matchNodeAtPosition != null &&
-						matchNodeAtPosition.matchComponent.type == matchNode.matchComponent.type)
-				{
-					reusableHorizontalOrVerticalMatchingNodes[reusableHorizontalOrVerticalMatchingNodes.length] = matchNodeAtPosition;
-					currentY += tileSize;
-				}
-				else
-				{
-					break;
-				}
-			}
 
-			if (reusableHorizontalOrVerticalMatchingNodes.length < MINIMUM_LINE_LENGTH - 1)
-			{
-				reusableHorizontalOrVerticalMatchingNodes.length = 0;
-			}
-
-			return reusableHorizontalOrVerticalMatchingNodes;
+			return false;
 		}
 
 		private function updateMatchNodesByPosition(matchNodeList : NodeList) : void
@@ -305,7 +250,7 @@ package drop.board
 		[Inline]
 		private final function getKey(positionX : Number, positionY : Number) : int
 		{
-			return positionY * boardSize.x + positionX;
+			return positionY * 100000 + positionX;
 		}
 	}
 }
