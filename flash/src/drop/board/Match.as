@@ -29,7 +29,7 @@ package drop.board
 				leftMostPositionX = MathUtils.min(leftMostPositionX, matchNode.transformComponent.x);
 				rightMostPositionX = MathUtils.max(rightMostPositionX, matchNode.transformComponent.x);
 			}
-			return rightMostPositionX - leftMostPositionX + tileSize;
+			return (rightMostPositionX - leftMostPositionX + tileSize) / tileSize;
 		}
 
 		private function calculateHeight() : uint
@@ -41,7 +41,7 @@ package drop.board
 				topMostPositionY = MathUtils.min(topMostPositionY, matchNode.transformComponent.y);
 				bottomMostPositionY = MathUtils.max(bottomMostPositionY, matchNode.transformComponent.y);
 			}
-			return bottomMostPositionY - topMostPositionY + 70;
+			return (bottomMostPositionY - topMostPositionY + tileSize) / tileSize;
 		}
 	}
 }

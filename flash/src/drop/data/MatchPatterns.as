@@ -12,15 +12,7 @@ package drop.data
 
 		public static function getFromMatch(match : Match) : int
 		{
-			if (match.matchNodes.length == 3)
-			{
-				return THREE_IN_A_ROW;
-			}
-			else if (match.matchNodes.length == 4)
-			{
-				return FOUR_IN_A_ROW;
-			}
-			else if (match.width == 5 || match.height == 5)
+			if (match.width == 5 || match.height == 5)
 			{
 				return FIVE_OR_MORE_IN_A_ROW;
 			}
@@ -28,26 +20,17 @@ package drop.data
 			{
 				return T_OR_L;
 			}
+			else if (match.width == 4 || match.height == 4)
+			{
+				return FOUR_IN_A_ROW;
+			}
+			else if (match.width == 3 || match.height == 3)
+			{
+				return THREE_IN_A_ROW;
+			}
 			else
 			{
 				return NONE;
-			}
-		}
-
-		public static function getName(pattern : int) : String
-		{
-			switch (pattern)
-			{
-				case MatchPatterns.THREE_IN_A_ROW:
-					return "Three in a row";
-				case MatchPatterns.FOUR_IN_A_ROW:
-					return "Four in a row";
-				case MatchPatterns.T_OR_L:
-					return "T or L";
-				case MatchPatterns.FIVE_OR_MORE_IN_A_ROW:
-					return "Five in a row";
-				default:
-					return "";
 			}
 		}
 	}
