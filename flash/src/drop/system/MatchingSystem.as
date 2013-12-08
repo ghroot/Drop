@@ -6,11 +6,10 @@ package drop.system
 
 	import drop.board.Match;
 	import drop.board.Matcher;
-	import drop.data.GameRules;
-	import drop.data.GameState;
 	import drop.data.MatchInfo;
 	import drop.data.MatchPatternLevel;
 	import drop.data.MatchPatterns;
+	import drop.node.GameNode;
 	import drop.node.MatchNode;
 
 	import flash.geom.Point;
@@ -18,27 +17,25 @@ package drop.system
 	public class MatchingSystem extends System
 	{
 		private var matcher : Matcher;
-		private var gameState : GameState;
-		private var gameRules : GameRules;
 
+		private var gameNode : GameNode;
 		private var matchNodeList : NodeList;
 
-		public function MatchingSystem(matcher : Matcher, gameState : GameState, gameRules : GameRules)
+		public function MatchingSystem(matcher : Matcher)
 		{
 			this.matcher = matcher;
-			this.gameState = gameState;
-			this.gameRules = gameRules;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
+			gameNode = engine.getNodeList(GameNode).head;
 			matchNodeList = engine.getNodeList(MatchNode);
 		}
 
 		override public function update(time : Number) : void
 		{
-			gameState.matchInfos.length = 0;
-			gameState.matchInfoToHighlight = null;
+			gameNode.gameStateComponent.matchInfos.length = 0;
+			gameNode.gameStateComponent.matchInfoToHighlight = null;
 
 			var matches : Vector.<Match> = matcher.getMatches(matchNodeList);
 			for each (var match : Match in matches)
@@ -49,7 +46,7 @@ package drop.system
 				}
 
 				var pattern : int = MatchPatterns.getFromMatch(match);
-				var matchPatternLevel : MatchPatternLevel = gameState.matchPatternLevels[pattern];
+				var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[pattern];
 
 				var creditsToAdd : int = match.matchNodes.length;
 				if (match.matchNodes.length >= 5)
@@ -61,7 +58,8 @@ package drop.system
 					creditsToAdd *= 2;
 				}
 				creditsToAdd += matchPatternLevel.getNumberOfBonusCredits();
-				gameRules.addPendingCredits(creditsToAdd);
+				gameNode.gameStateComponent.pendingCredits += creditsToAdd;
+				gameNode.gameStateComponent.pendingCreditsUpdated.dispatch();
 
 				var matchInfo : MatchInfo = createMatchInfo(pattern, match);
 
@@ -70,13 +68,13 @@ package drop.system
 				if (matchPatternLevel.getLevel() > level)
 				{
 					// TODO: Handle several match infos to highlight
-					gameState.matchInfoToHighlight = matchInfo;
+					gameNode.gameStateComponent.matchInfoToHighlight = matchInfo;
 				}
 
-				gameState.matchInfos[gameState.matchInfos.length] = matchInfo;
+				gameNode.gameStateComponent.matchInfos[gameNode.gameStateComponent.matchInfos.length] = matchInfo;
 			}
 
-			gameState.totalNumberOfMatchesDuringCascading += matches.length;
+			gameNode.gameStateComponent.totalNumberOfMatchesDuringCascading += matches.length;
 		}
 
 		private function createMatchInfo(pattern : int, match : Match) : MatchInfo

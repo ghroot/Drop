@@ -3,9 +3,9 @@ package drop.system
 	import ash.core.Engine;
 	import ash.core.System;
 
-	import drop.data.GameState;
 	import drop.data.MatchInfo;
 	import drop.data.MatchPatternLevel;
+	import drop.node.GameNode;
 	import drop.util.MathUtils;
 
 	import flash.geom.Point;
@@ -24,16 +24,15 @@ package drop.system
 		private var container : Sprite;
 		private var boardSize : Point;
 		private var tileSize : int;
-		private var gameState : GameState;
 
+		private var gameNode : GameNode;
 		private var textField : TextField;
 
-		public function HighlightDisplaySystem(container : Sprite, boardSize : Point, tileSize : int, gameState : GameState)
+		public function HighlightDisplaySystem(container : Sprite, boardSize : Point, tileSize : int)
 		{
 			this.container = container;
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
-			this.gameState = gameState;
 
 			textField = new TextField(150, 100, "", "fontSmall", 20, Color.BLACK);
 			textField.hAlign = HAlign.CENTER;
@@ -42,10 +41,12 @@ package drop.system
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			var matchPatternLevel : MatchPatternLevel = gameState.matchPatternLevels[gameState.matchInfoToHighlight.pattern];
-			textField.text = "This pattern now gives " + (gameState.matchInfoToHighlight.positions.length + matchPatternLevel.getNumberOfBonusCredits()) + " points.";
+			gameNode = engine.getNodeList(GameNode).head;
 
-			var bounds : Rectangle = getMatchBounds(gameState.matchInfoToHighlight);
+			var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[gameNode.gameStateComponent.matchInfoToHighlight.pattern];
+			textField.text = "This shape now gives " + (gameNode.gameStateComponent.matchInfoToHighlight.positions.length + matchPatternLevel.getNumberOfBonusCredits()) + " points.";
+
+			var bounds : Rectangle = getMatchBounds(gameNode.gameStateComponent.matchInfoToHighlight);
 			var spaceUp : Number = bounds.y;
 			var spaceDown : Number = boardSize.y * tileSize - (bounds.y + bounds.height);
 			var spaceLeft : Number = bounds.x;

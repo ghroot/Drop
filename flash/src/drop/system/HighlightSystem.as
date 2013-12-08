@@ -4,26 +4,24 @@ package drop.system
 	import ash.core.NodeList;
 	import ash.core.System;
 
-	import drop.data.GameState;
+	import drop.node.GameNode;
 	import drop.node.MatchNode;
 
 	import flash.geom.Point;
 
 	public class HighlightSystem extends System
 	{
-		private var gameState : GameState;
+		private var gameNode : GameNode;
 
-		private var matchNodeList : NodeList;
-
-		public function HighlightSystem(gameState : GameState)
+		public function HighlightSystem()
 		{
-			this.gameState = gameState;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
-			matchNodeList = engine.getNodeList(MatchNode);
-
+			gameNode = engine.getNodeList(GameNode).head;
+			
+			var matchNodeList : NodeList = engine.getNodeList(MatchNode);
 			for (var matchNode : MatchNode = matchNodeList.head; matchNode; matchNode = matchNode.next)
 			{
 				if (shouldHighlightMatchNode(matchNode))
@@ -39,7 +37,7 @@ package drop.system
 
 		private function shouldHighlightMatchNode(matchNode : MatchNode) : Boolean
 		{
-			for each (var position : Point in gameState.matchInfoToHighlight.positions)
+			for each (var position : Point in gameNode.gameStateComponent.matchInfoToHighlight.positions)
 			{
 				if (matchNode.transformComponent.x == position.x &&
 						matchNode.transformComponent.y == position.y)

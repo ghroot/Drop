@@ -6,8 +6,7 @@ package drop.board
 	import ash.integration.starling.StarlingFixedTickProvider;
 	import ash.tick.ITickProvider;
 
-	import drop.data.GameRules;
-	import drop.data.GameState;
+	import drop.node.GameNode;
 	import drop.node.SpawnerNode;
 	import drop.scene.SceneContainer;
 	import drop.system.AddPendingCreditsSystem;
@@ -51,13 +50,12 @@ package drop.board
 	{
 		private var assets : AssetManager;
 
-		private var engine : Engine;
-		private var gameState : GameState;
-
 		private var boardSize : Point;
 		private var tileSize : int;
 		private var sceneContainer : SceneContainer;
 		private var dragStartPositionY : Number = -1;
+		private var engine : Engine;
+		private var gameNode : GameNode;
 
 		public function Board(assets : AssetManager)
 		{
@@ -96,14 +94,12 @@ package drop.board
 
 		private function createWorld() : void
 		{
-			gameState = new GameState();
-			var gameRules : GameRules = new GameRules(gameState);
-
 			engine = new Engine();
 
 			var entityManager : EntityManager = new EntityManager(engine, assets, boardSize, tileSize);
 
-			var matcher : Matcher = new Matcher(boardSize, tileSize);
+			engine.addEntity(entityManager.createGame());
+			gameNode = engine.getNodeList(GameNode).head;
 
 			for (var row : int = 0; row < boardSize.y; row++)
 			{
@@ -126,41 +122,43 @@ package drop.board
 				}
 			}
 
+			var matcher : Matcher = new Matcher(boardSize, tileSize);
+
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var selectingState : EngineState = stateMachine.createState("selecting");
-			selectingState.addInstance(new TouchInputSystem(sceneContainer.touchQuad, gameState)).withPriority(SystemPriorities.INPUT);
-			selectingState.addInstance(new SelectControlSystem(gameState, tileSize)).withPriority(SystemPriorities.CONTROL);
-			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
+			selectingState.addInstance(new TouchInputSystem(sceneContainer.touchQuad)).withPriority(SystemPriorities.INPUT);
+			selectingState.addInstance(new SelectControlSystem(tileSize)).withPriority(SystemPriorities.CONTROL);
+			selectingState.addInstance(new SelectingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var swappingState : EngineState = stateMachine.createState("swapping");
-			swappingState.addInstance(new SwapSystem(gameState)).withPriority(SystemPriorities.LOGIC);
-			swappingState.addInstance(new SwappingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
+			swappingState.addInstance(new SwapSystem()).withPriority(SystemPriorities.LOGIC);
+			swappingState.addInstance(new SwappingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var matchingState : EngineState = stateMachine.createState("matching");
-			matchingState.addInstance(new MatchingSystem(matcher, gameState, gameRules)).withPriority(SystemPriorities.LOGIC);
-			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine, gameState)).withPriority(SystemPriorities.END);
+			matchingState.addInstance(new MatchingSystem(matcher)).withPriority(SystemPriorities.LOGIC);
+			matchingState.addInstance(new MatchingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var highlightingState : EngineState = stateMachine.createState("highlighting");
-			highlightingState.addInstance(new HighlightSystem(gameState)).withPriority(SystemPriorities.PRE_LOGIC);
-			highlightingState.addInstance(new HighlightDisplaySystem(sceneContainer.overlayContainer, boardSize, tileSize, gameState)).withPriority(SystemPriorities.DISPLAY);
+			highlightingState.addInstance(new HighlightSystem()).withPriority(SystemPriorities.PRE_LOGIC);
+			highlightingState.addInstance(new HighlightDisplaySystem(sceneContainer.overlayContainer, boardSize, tileSize)).withPriority(SystemPriorities.DISPLAY);
 			highlightingState.addInstance(new HighlightingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var cascadingState : EngineState = stateMachine.createState("cascading");
-			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager, boardSize, tileSize, gameRules)).withPriority(SystemPriorities.LOGIC);
+			cascadingState.addInstance(new LineBlastDetonationSystem(entityManager, boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new SpawnerSystem(tileSize, entityManager)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new MoveSystem(boardSize, tileSize)).withPriority(SystemPriorities.LOGIC);
 			cascadingState.addInstance(new CascadingStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var turnEndState : EngineState = stateMachine.createState("turnEnd");
-			turnEndState.addInstance(new ComboSystem(gameState, gameRules)).withPriority(SystemPriorities.PRE_LOGIC);
-			turnEndState.addInstance(new AddPendingCreditsSystem(gameRules)).withPriority(SystemPriorities.LOGIC);
+			turnEndState.addInstance(new ComboSystem()).withPriority(SystemPriorities.PRE_LOGIC);
+			turnEndState.addInstance(new AddPendingCreditsSystem()).withPriority(SystemPriorities.LOGIC);
 			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine, matcher, entityManager)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField, gameState), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(sceneContainer.boardContainer, tileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("selecting");
@@ -172,7 +170,7 @@ package drop.board
 
 		private function onBottomTouch(event : TouchEvent) : void
 		{
-			if (gameState.isSelecting)
+			if (gameNode.gameStateComponent.isSelecting)
 			{
 				var touch : Touch = event.getTouch(event.target as DisplayObject);
 				if (touch != null)
@@ -228,10 +226,10 @@ package drop.board
 				if (spawnerNode.transformComponent.x == spawnerButton.x)
 				{
 					if (spawnerNode.spawnerComponent.spawnerLevel < 4 &&
-							gameState.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
+							gameNode.gameStateComponent.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
 					{
-						gameState.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
-						gameState.creditsUpdated.dispatch(gameState.credits);
+						gameNode.gameStateComponent.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
+						gameNode.gameStateComponent.creditsUpdated.dispatch(gameNode.gameStateComponent.credits);
 
 						spawnerNode.spawnerComponent.spawnerLevel++;
 

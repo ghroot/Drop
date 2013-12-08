@@ -12,7 +12,7 @@ package drop.data
 
 		public static function getFromMatch(match : Match) : int
 		{
-			if (match.width == 5 || match.height == 5)
+			if (match.width >= 5 || match.height >= 5)
 			{
 				return FIVE_OR_MORE_IN_A_ROW;
 			}

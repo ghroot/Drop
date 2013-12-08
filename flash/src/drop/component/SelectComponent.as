@@ -8,9 +8,9 @@ package drop.component
 
 		public static function create() : SelectComponent
 		{
-			var selectComponent : SelectComponent = ComponentPool.get(SelectComponent);
-			selectComponent.reset();
-			return selectComponent;
+			var component : SelectComponent = ComponentPool.get(SelectComponent);
+			component.reset();
+			return component;
 		}
 
 		public function reset() : void

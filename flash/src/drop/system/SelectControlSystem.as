@@ -2,8 +2,8 @@ package drop.system
 {
 	import ash.core.*;
 
-	import drop.data.GameState;
 	import drop.data.Input;
+	import drop.node.GameNode;
 	import drop.node.SelectNode;
 
 	import flash.geom.Rectangle;
@@ -12,12 +12,13 @@ package drop.system
 	{
 		private var tileSize : int;
 
+		private var gameNode : GameNode;
 		private var selectNodeList : NodeList;
 		private var reusableRectangle : Rectangle;
 
-		public function SelectControlSystem(gameState : GameState, tileSize : int)
+		public function SelectControlSystem(tileSize : int)
 		{
-			super(gameState, Vector.<int>([Input.TOUCH_BEGAN, Input.TOUCH_MOVE]));
+			super(Vector.<int>([Input.TOUCH_BEGAN, Input.TOUCH_MOVE]));
 
 			this.tileSize = tileSize;
 
@@ -26,15 +27,18 @@ package drop.system
 
 		override public function addToEngine(engine : Engine) : void
 		{
+			super.addToEngine(engine);
+
+			gameNode = engine.getNodeList(GameNode).head;
 			selectNodeList = engine.getNodeList(SelectNode);
 
-			gameState.isSelecting = true;
-			gameState.shouldStartSwap = false;
+			gameNode.gameStateComponent.isSelecting = true;
+			gameNode.gameStateComponent.shouldStartSwap = false;
 		}
 
 		override public function removeFromEngine(engine : Engine) : void
 		{
-			gameState.isSelecting = false;
+			gameNode.gameStateComponent.isSelecting = false;
 		}
 
 		override protected function handleInput(input : Input) : void
@@ -74,7 +78,7 @@ package drop.system
 					selectNode.selectComponent.isSelected = true;
 					selectNode.stateComponent.stateMachine.changeState("selected");
 
-					gameState.shouldStartSwap = true;
+					gameNode.gameStateComponent.shouldStartSwap = true;
 				}
 				else
 				{
@@ -97,7 +101,7 @@ package drop.system
 				selectNode.selectComponent.isSelected = true;
 				selectNode.stateComponent.stateMachine.changeState("selected");
 
-				gameState.shouldStartSwap = true;
+				gameNode.gameStateComponent.shouldStartSwap = true;
 			}
 		}
 

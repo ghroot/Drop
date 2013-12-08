@@ -1,8 +1,9 @@
 package drop.system
 {
+	import ash.core.Engine;
 	import ash.core.System;
 
-	import drop.data.GameState;
+	import drop.node.GameNode;
 
 	import starling.animation.Tween;
 	import starling.core.Starling;
@@ -10,27 +11,38 @@ package drop.system
 
 	public class HudDisplaySystem extends System
 	{
-		private var gameState : GameState;
 		private var creditsTextField : TextField;
 		private var pendingCreditsTextField : TextField;
 
-		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField, gameState : GameState)
+		private var gameNode : GameNode;
+
+		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField)
 		{
 			this.creditsTextField = creditsTextField;
 			this.pendingCreditsTextField = pendingCreditsTextField;
-			this.gameState = gameState;
 
 			pendingCreditsTextField.visible = false;
-
-			gameState.creditsUpdated.add(onCreditsUpdated);
-			gameState.pendingCreditsUpdated.add(onPendingCreditsUpdated);
 		}
 
-		private function onCreditsUpdated(credits : int) : void
+		override public function addToEngine(engine : Engine) : void
+		{
+			gameNode = engine.getNodeList(GameNode).head;
+
+			gameNode.gameStateComponent.creditsUpdated.add(onCreditsUpdated);
+			gameNode.gameStateComponent.pendingCreditsUpdated.add(onPendingCreditsUpdated);
+		}
+
+		override public function removeFromEngine(engine : Engine) : void
+		{
+			gameNode.gameStateComponent.creditsUpdated.remove(onCreditsUpdated);
+			gameNode.gameStateComponent.pendingCreditsUpdated.remove(onPendingCreditsUpdated);
+		}
+
+		private function onCreditsUpdated() : void
 		{
 			var proxy : Object = { "credits": parseInt(creditsTextField.text) };
 			var tween : Tween = new Tween(proxy, 0.2);
-			tween.animate("credits", gameState.credits);
+			tween.animate("credits", gameNode.gameStateComponent.credits);
 			tween.onUpdate = function() : void
 			{
 				creditsTextField.text = int(proxy.credits).toString();
@@ -38,9 +50,9 @@ package drop.system
 			Starling.juggler.add(tween);
 		}
 
-		private function onPendingCreditsUpdated(pendingCredits : int) : void
+		private function onPendingCreditsUpdated() : void
 		{
-			if (pendingCredits == 0)
+			if (gameNode.gameStateComponent.pendingCredits == 0)
 			{
 				const originalY : Number = pendingCreditsTextField.y;
 				var tween : Tween = new Tween(pendingCreditsTextField, 0.3);
@@ -61,7 +73,7 @@ package drop.system
 
 				var proxy : Object = { "pendingCredits": parseInt(pendingCreditsTextField.text) };
 				tween = new Tween(proxy, 0.2);
-				tween.animate("pendingCredits", gameState.pendingCredits);
+				tween.animate("pendingCredits", gameNode.gameStateComponent.pendingCredits);
 				tween.onUpdate = function() : void
 				{
 					pendingCreditsTextField.text = "+" + int(proxy.pendingCredits) + " ";

@@ -5,36 +5,36 @@ package drop.system
 	import ash.core.System;
 	import ash.fsm.EngineStateMachine;
 
-	import drop.data.GameState;
+	import drop.node.GameNode;
 	import drop.node.SelectNode;
 	import drop.node.SelectNodeUtils;
 
 	public class MatchingStateEndingSystem extends System
 	{
 		private var stateMachine : EngineStateMachine;
-		private var gameState : GameState;
 
+		private var gameNode : GameNode;
 		private var selectNodeList : NodeList;
 
-		public function MatchingStateEndingSystem(stateMachine : EngineStateMachine, gameState : GameState)
+		public function MatchingStateEndingSystem(stateMachine : EngineStateMachine)
 		{
 			this.stateMachine = stateMachine;
-			this.gameState = gameState;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
+			gameNode = engine.getNodeList(GameNode).head;
 			selectNodeList = engine.getNodeList(SelectNode);
 		}
 
 		override public function update(time : Number) : void
 		{
-			if (gameState.matchInfos.length > 0)
+			if (gameNode.gameStateComponent.matchInfos.length > 0)
 			{
 				SelectNodeUtils.deselectSelectNodes(selectNodeList);
-				gameState.isTryingSwap = false;
+				gameNode.gameStateComponent.isTryingSwap = false;
 
-				if (gameState.matchInfoToHighlight != null)
+				if (gameNode.gameStateComponent.matchInfoToHighlight != null)
 				{
 					stateMachine.changeState("highlighting");
 				}
@@ -43,10 +43,10 @@ package drop.system
 					stateMachine.changeState("cascading");
 				}
 			}
-			else if (gameState.isTryingSwap)
+			else if (gameNode.gameStateComponent.isTryingSwap)
 			{
-				gameState.isTryingSwap = false;
-				gameState.isSwappingBack = true;
+				gameNode.gameStateComponent.isTryingSwap = false;
+				gameNode.gameStateComponent.isSwappingBack = true;
 				stateMachine.changeState("swapping");
 			}
 			else

@@ -10,6 +10,7 @@ package drop.board
 	import drop.component.BlockComponent;
 	import drop.component.CountdownComponent;
 	import drop.component.DisplayComponent;
+	import drop.component.GameStateComponent;
 	import drop.component.LineBlastComponent;
 	import drop.component.LineBlastTargetComponent;
 	import drop.component.MatchComponent;
@@ -56,6 +57,15 @@ package drop.board
 			this.assets = assets;
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
+		}
+
+		public function createGame() : Entity
+		{
+			var entity : Entity = new Entity();
+
+			entity.add(GameStateComponent.create());
+
+			return entity;
 		}
 
 		public function createTile(x : Number, y : Number) : Entity

@@ -5,36 +5,36 @@ package drop.system
 	import ash.core.System;
 	import ash.fsm.EngineStateMachine;
 
-	import drop.data.GameState;
+	import drop.node.GameNode;
 	import drop.node.SelectNode;
 	import drop.node.SelectNodeUtils;
 
 	public class SwappingStateEndingSystem extends System
 	{
 		private var stateMachine : EngineStateMachine;
-		private var gameState : GameState;
 
+		private var gameNode : GameNode;
 		private var selectNodeList : NodeList;
 
-		public function SwappingStateEndingSystem(stateMachine : EngineStateMachine, gameState : GameState)
+		public function SwappingStateEndingSystem(stateMachine : EngineStateMachine)
 		{
 			this.stateMachine = stateMachine;
-			this.gameState = gameState;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
+			gameNode = engine.getNodeList(GameNode).head;
 			selectNodeList = engine.getNodeList(SelectNode);
 		}
 
 		override public function update(time : Number) : void
 		{
-			if (!gameState.swapInProgress)
+			if (!gameNode.gameStateComponent.swapInProgress)
 			{
-				if (gameState.isSwappingBack)
+				if (gameNode.gameStateComponent.isSwappingBack)
 				{
 					SelectNodeUtils.deselectSelectNodes(selectNodeList);
-					gameState.isSwappingBack = false;
+					gameNode.gameStateComponent.isSwappingBack = false;
 					stateMachine.changeState("selecting");
 				}
 				else

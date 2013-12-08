@@ -1,19 +1,21 @@
 package drop.system
 {
+	import ash.core.Engine;
 	import ash.core.System;
 
-	import drop.data.GameRules;
-	import drop.data.GameState;
+	import drop.node.GameNode;
 
 	public class ComboSystem extends System
 	{
-		private var gameState : GameState;
-		private var gameRules : GameRules;
+		private var gameNode : GameNode;
 
-		public function ComboSystem(gameState : GameState, gameRules : GameRules)
+		public function ComboSystem()
 		{
-			this.gameState = gameState;
-			this.gameRules = gameRules;
+		}
+
+		override public function addToEngine(engine : Engine) : void
+		{
+			gameNode = engine.getNodeList(GameNode).head;
 		}
 
 		override public function update(time : Number) : void
@@ -24,38 +26,66 @@ package drop.system
 
 		private function applyMatchesComboBonus() : void
 		{
-			if (gameState.totalNumberOfMatchesDuringCascading >= 50)
+			var matchesComboBonus : int = getMatchesComboBonus();
+			if (matchesComboBonus > 0)
 			{
-				gameRules.addPendingCredits(5000);
-			}
-			else if (gameState.totalNumberOfMatchesDuringCascading >= 20)
-			{
-				gameRules.addPendingCredits(1000);
-			}
-			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 10)
-			{
-				gameRules.addPendingCredits(200);
+				gameNode.gameStateComponent.pendingCredits += matchesComboBonus;
+				gameNode.gameStateComponent.pendingCreditsUpdated.dispatch();
 			}
 
-			gameState.totalNumberOfMatchesDuringCascading = 0;
+			gameNode.gameStateComponent.totalNumberOfMatchesDuringCascading = 0;
+		}
+
+		private function getMatchesComboBonus() : int
+		{
+			if (gameNode.gameStateComponent.totalNumberOfMatchesDuringCascading >= 50)
+			{
+				return 5000;
+			}
+			else if (gameNode.gameStateComponent.totalNumberOfMatchesDuringCascading >= 20)
+			{
+				return 1000;
+			}
+			else if (gameNode.gameStateComponent.totalNumberOfLineBlastsDuringCascading >= 10)
+			{
+				return 200;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 
 		private function applyLineBlastComboBonus() : void
 		{
-			if (gameState.totalNumberOfLineBlastsDuringCascading >= 10)
+			var lineBlastComboBonus : int = getLineBlastComboBonus();
+			if (lineBlastComboBonus > 0)
 			{
-				gameRules.addPendingCredits(1000);
-			}
-			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 5)
-			{
-				gameRules.addPendingCredits(300);
-			}
-			else if (gameState.totalNumberOfLineBlastsDuringCascading >= 3)
-			{
-				gameRules.addPendingCredits(50);
+				gameNode.gameStateComponent.pendingCredits += lineBlastComboBonus;
+				gameNode.gameStateComponent.pendingCreditsUpdated.dispatch();
 			}
 
-			gameState.totalNumberOfLineBlastsDuringCascading = 0;
+			gameNode.gameStateComponent.totalNumberOfLineBlastsDuringCascading = 0;
+		}
+
+		private function getLineBlastComboBonus() : int
+		{
+			if (gameNode.gameStateComponent.totalNumberOfLineBlastsDuringCascading >= 10)
+			{
+				return 1000;
+			}
+			else if (gameNode.gameStateComponent.totalNumberOfLineBlastsDuringCascading >= 5)
+			{
+				return 300;
+			}
+			else if (gameNode.gameStateComponent.totalNumberOfLineBlastsDuringCascading >= 3)
+			{
+				return 50;
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	}
 }

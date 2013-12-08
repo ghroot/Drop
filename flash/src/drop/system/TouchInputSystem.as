@@ -3,8 +3,8 @@ package drop.system
 	import ash.core.Engine;
 	import ash.core.System;
 
-	import drop.data.GameState;
 	import drop.data.Input;
+	import drop.node.GameNode;
 
 	import flash.geom.Point;
 
@@ -16,18 +16,19 @@ package drop.system
 	public class TouchInputSystem extends System
 	{
 		private var boardDisplayObject : DisplayObject;
-		private var gameState : GameState;
 
+		private var gameNode : GameNode;
 		private var inputsSinceLastUpdate : Vector.<Input>;
 
-		public function TouchInputSystem(boardDisplayObject : DisplayObject, gameState : GameState)
+		public function TouchInputSystem(boardDisplayObject : DisplayObject)
 		{
 			this.boardDisplayObject = boardDisplayObject;
-			this.gameState = gameState;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
+			gameNode = engine.getNodeList(GameNode).head;
+
 			inputsSinceLastUpdate = new Vector.<Input>();
 
 			boardDisplayObject.addEventListener(TouchEvent.TOUCH, onTouch);
@@ -42,7 +43,7 @@ package drop.system
 		{
 			for each (var input : Input in inputsSinceLastUpdate)
 			{
-				gameState.inputs[gameState.inputs.length] = input;
+				gameNode.gameStateComponent.inputs[gameNode.gameStateComponent.inputs.length] = input;
 			}
 
 			inputsSinceLastUpdate.length = 0;

@@ -6,7 +6,7 @@ package drop.system
 
 	import drop.board.EntityManager;
 	import drop.component.MatchComponent;
-	import drop.data.GameRules;
+	import drop.node.GameNode;
 	import drop.node.LineBlastNode;
 	import drop.node.LineBlastTargetNode;
 
@@ -17,24 +17,24 @@ package drop.system
 		private var entityManager : EntityManager;
 		private var boardSize : Point;
 		private var tileSize : int;
-		private var gameRules : GameRules;
 
 		private var engine : Engine;
+		private var gameNode : GameNode;
 		private var lineBlastNodeList : NodeList;
 		private var lineBlastTargetNodeList : NodeList;
 
-		public function LineBlastDetonationSystem(entityManager : EntityManager, boardSize : Point, tileSize : int, gameRules : GameRules)
+		public function LineBlastDetonationSystem(entityManager : EntityManager, boardSize : Point, tileSize : int)
 		{
 			this.entityManager = entityManager;
 			this.boardSize = boardSize;
 			this.tileSize = tileSize;
-			this.gameRules = gameRules;
 		}
 
 		override public function addToEngine(engine : Engine) : void
 		{
 			this.engine = engine;
 
+			gameNode = engine.getNodeList(GameNode).head;
 			lineBlastNodeList = engine.getNodeList(LineBlastNode);
 			lineBlastTargetNodeList = engine.getNodeList(LineBlastTargetNode);
 		}
@@ -64,7 +64,8 @@ package drop.system
 						{
 							lineBlastTargetNode.stateComponent.stateMachine.changeState("destroyedByLineBlast");
 
-							gameRules.addPendingCredits(1);
+							gameNode.gameStateComponent.pendingCredits += 2;
+							gameNode.gameStateComponent.pendingCreditsUpdated.dispatch();
 						}
 					}
 

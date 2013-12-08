@@ -2,24 +2,30 @@ package drop.system
 {
 	import ash.core.*;
 
-	import drop.data.GameState;
+	import drop.component.GameStateComponent;
 	import drop.data.Input;
+	import drop.node.GameNode;
 
 	public class AbstractControlSystem extends System
 	{
-		protected var gameState : GameState;
 		private var inputTypes : Vector.<int>;
 
-		public function AbstractControlSystem(gameState : GameState, inputTypes : Vector.<int>)
+		private var gameNode : GameNode;
+
+		public function AbstractControlSystem(inputTypes : Vector.<int>)
 		{
-			this.gameState = gameState;
 			this.inputTypes = inputTypes;
+		}
+
+		override public function addToEngine(engine : Engine) : void
+		{
+			gameNode = engine.getNodeList(GameNode).head;
 		}
 
 		override public function update(time : Number) : void
 		{
 			var handledInputs : Vector.<Input> = null;
-			for each (var input : Input in gameState.inputs)
+			for each (var input : Input in gameNode.gameStateComponent.inputs)
 			{
 				if (inputTypes.indexOf(input.type) >= 0)
 				{
@@ -35,7 +41,7 @@ package drop.system
 			{
 				for each (input in handledInputs)
 				{
-					gameState.inputs.splice(gameState.inputs.indexOf(input), 1);
+					gameNode.gameStateComponent.inputs.splice(gameNode.gameStateComponent.inputs.indexOf(input), 1);
 				}
 			}
 		}

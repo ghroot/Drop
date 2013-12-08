@@ -1,11 +1,15 @@
-package drop.data
+package drop.component
 {
+	import ash.tools.ComponentPool;
+
+	import drop.data.*;
+
 	import flash.utils.Dictionary;
 
 	import org.osflash.signals.ISignal;
 	import org.osflash.signals.Signal;
 
-	public class GameState
+	public class GameStateComponent
 	{
 		public var creditsUpdated : ISignal;
 		public var pendingCreditsUpdated : ISignal;
@@ -28,11 +32,21 @@ package drop.data
 		public var matchPatternLevels : Dictionary;
 		public var isSelecting : Boolean;
 
-		public function GameState()
+		public function GameStateComponent()
 		{
-			creditsUpdated = new Signal(int);
-			pendingCreditsUpdated = new Signal(int);
+			creditsUpdated = new Signal();
+			pendingCreditsUpdated = new Signal();
+		}
 
+		public static function create() : GameStateComponent
+		{
+			var component : GameStateComponent = ComponentPool.get(GameStateComponent);
+			component.reset();
+			return component;
+		}
+
+		public function reset() : void
+		{
 			inputs = new Vector.<Input>();
 			matchInfos = new Vector.<MatchInfo>();
 			matchPatternLevels = new Dictionary();
