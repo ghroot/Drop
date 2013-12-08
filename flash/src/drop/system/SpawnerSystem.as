@@ -70,7 +70,7 @@ package drop.system
 
 		private function getChanceToCreateLineBlast(spawnerNode : SpawnerNode) : int
 		{
-			switch (spawnerNode.spawnerComponent.spawnerLevel.level)
+			switch (spawnerNode.spawnerComponent.spawnerLevel)
 			{
 				case 1:
 					return 0;

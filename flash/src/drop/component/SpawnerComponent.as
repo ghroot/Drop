@@ -2,11 +2,9 @@ package drop.component
 {
 	import ash.tools.ComponentPool;
 
-	import drop.data.SpawnerLevel;
-
 	public class SpawnerComponent
 	{
-		public var spawnerLevel : SpawnerLevel;
+		public var spawnerLevel : int;
 
 		public static function create() : SpawnerComponent
 		{
@@ -17,12 +15,12 @@ package drop.component
 
 		public function reset() : void
 		{
-			spawnerLevel = new SpawnerLevel(1);
+			spawnerLevel = 1;
 		}
 
 		public function withLevel(value : int) : SpawnerComponent
 		{
-			spawnerLevel.level = value;
+			spawnerLevel = value;
 			return this;
 		}
 	}

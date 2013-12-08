@@ -227,15 +227,15 @@ package drop.board
 			{
 				if (spawnerNode.transformComponent.x == spawnerButton.x)
 				{
-					if (spawnerNode.spawnerComponent.spawnerLevel.level < 4 &&
+					if (spawnerNode.spawnerComponent.spawnerLevel < 4 &&
 							gameState.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
 					{
 						gameState.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
 						gameState.creditsUpdated.dispatch(gameState.credits);
 
-						spawnerNode.spawnerComponent.spawnerLevel.level++;
+						spawnerNode.spawnerComponent.spawnerLevel++;
 
-						spawnerButton.text = spawnerNode.spawnerComponent.spawnerLevel.level.toString();
+						spawnerButton.text = spawnerNode.spawnerComponent.spawnerLevel.toString();
 					}
 				}
 			}
@@ -243,7 +243,7 @@ package drop.board
 
 		private function getCostForSpawnerLevelUpgrade(spawnerNode : SpawnerNode) : int
 		{
-			switch (spawnerNode.spawnerComponent.spawnerLevel.level)
+			switch (spawnerNode.spawnerComponent.spawnerLevel)
 			{
 				case 1:
 				{
