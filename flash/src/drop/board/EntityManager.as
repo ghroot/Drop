@@ -19,6 +19,7 @@ package drop.board
 	import drop.component.SpawnerComponent;
 	import drop.component.StateComponent;
 	import drop.component.TransformComponent;
+	import drop.component.TypeComponent;
 	import drop.component.script.AlphaScript;
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
@@ -129,6 +130,7 @@ package drop.board
 			entity.add(BlockComponent.create());
 			entity.add(MatchComponent.create().withType(type));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
+			entity.add(TypeComponent.create().withType("tile"));
 
 			stateMachine.changeState("idle");
 
@@ -207,6 +209,7 @@ package drop.board
 			entity.add(BlockComponent.create());
 			entity.add(MatchComponent.create().withType(type));
 			entity.add(StateComponent.create().withStateMachine(stateMachine));
+			entity.add(TypeComponent.create().withType("lineBlast"));
 
 			stateMachine.changeState("idle");
 
@@ -265,6 +268,7 @@ package drop.board
 
 			entity.add(SpawnerComponent.create());
 			entity.add(TransformComponent.create().withX(x).withY(y));
+			entity.add(TypeComponent.create().withType("spawner"));
 
 			return entity;
 		}
@@ -275,6 +279,7 @@ package drop.board
 
 			entity.add(BlockComponent.create());
 			entity.add(TransformComponent.create().withX(x).withY(y));
+			entity.add(TypeComponent.create().withType("blocker"));
 
 			return entity;
 		}
