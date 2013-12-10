@@ -254,7 +254,7 @@ package drop.board
 			sprite.addChild(fadedVerticalQuad);
 			sprite.addChild(horizontalQuad);
 			sprite.addChild(verticalQuad);
-			entity.add(DisplayComponent.create().withDisplayObject(sprite));
+			entity.add(DisplayComponent.create().withDisplayObject(sprite, ZOrder.TOP));
 
 			var pulsateTween : Tween = new Tween(sprite, 0.075);
 			pulsateTween.animate("alpha", 0.6);
