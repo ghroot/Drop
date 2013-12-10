@@ -30,6 +30,9 @@ package drop.system
 
 			gameNode.gameStateComponent.creditsUpdated.add(onCreditsUpdated);
 			gameNode.gameStateComponent.pendingCreditsUpdated.add(onPendingCreditsUpdated);
+
+			creditsTextField.text = gameNode.gameStateComponent.credits.toString();
+			pendingCreditsTextField.text = gameNode.gameStateComponent.pendingCredits.toString();
 		}
 
 		override public function removeFromEngine(engine : Engine) : void

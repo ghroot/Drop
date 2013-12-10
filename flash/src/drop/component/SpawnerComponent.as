@@ -15,10 +15,10 @@ package drop.component
 
 		public function reset() : void
 		{
-			spawnerLevel = 1;
+			spawnerLevel = 0;
 		}
 
-		public function withLevel(value : int) : SpawnerComponent
+		public function withSpawnerLevel(value : int) : SpawnerComponent
 		{
 			spawnerLevel = value;
 			return this;

@@ -24,6 +24,8 @@ package drop.board
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
 	import drop.component.script.TweenScript;
+	import drop.data.MatchPatternLevel;
+	import drop.data.MatchPatterns;
 	import drop.data.ZOrder;
 	import drop.util.DisplayUtils;
 
@@ -60,22 +62,26 @@ package drop.board
 			this.tileSize = tileSize;
 		}
 
-		public function createGame() : Entity
+		public function createGame(credits : int = 0, matchPatternPoints : Object = null) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(GameStateComponent.create());
+			entity.add(GameStateComponent.create().withCredits(credits).withMatchPatternPoints(matchPatternPoints));
+			entity.add(TypeComponent.create().withType("game"));
 
 			return entity;
 		}
 
-		public function createTile(x : Number, y : Number) : Entity
+		public function createTile(x : Number, y : Number, type : int = 0) : Entity
 		{
 			var entity : Entity = new Entity();
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var type : int = 1 + Math.floor(Math.random() * 5);
+			if (type == 0)
+			{
+				type = 1 + Math.floor(Math.random() * 5);
+			}
 			var image : Image = new Image(assets.getTexture("tile_" + type));
 			DisplayUtils.centerPivot(image);
 			image.touchable = false;
@@ -137,13 +143,16 @@ package drop.board
 			return entity;
 		}
 
-		public function createLineBlast(x : Number, y : Number) : Entity
+		public function createLineBlast(x : Number, y : Number, type : int = 0) : Entity
 		{
 			var entity : Entity = new Entity();
 
 			var stateMachine : EntityStateMachine = new EntityStateMachine(entity);
 
-			var type : int = 1 + Math.floor(Math.random() * 5);
+			if (type == 0)
+			{
+				type = 1 + Math.floor(Math.random() * 5);
+			}
 			var image : Image = new Image(assets.getTexture("lineblast_" + type));
 			DisplayUtils.centerPivot(image);
 			image.touchable = false;
@@ -262,11 +271,11 @@ package drop.board
 			return entity;
 		}
 
-		public function createSpawner(x : Number, y : Number) : Entity
+		public function createSpawner(x : Number, y : Number, spawnerLevel : int = 1) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(SpawnerComponent.create());
+			entity.add(SpawnerComponent.create().withSpawnerLevel(spawnerLevel));
 			entity.add(TransformComponent.create().withX(x).withY(y));
 			entity.add(TypeComponent.create().withType("spawner"));
 

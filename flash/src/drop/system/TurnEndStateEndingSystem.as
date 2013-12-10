@@ -33,7 +33,7 @@ package drop.system
 		{
 			if (matcher.hasPossibleMatches(matchNodeList))
 			{
-				stateMachine.changeState("selecting");
+				stateMachine.changeState("turnStart");
 			}
 			else
 			{

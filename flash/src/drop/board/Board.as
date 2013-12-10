@@ -8,6 +8,7 @@ package drop.board
 
 	import drop.node.GameNode;
 	import drop.node.SpawnerNode;
+	import drop.persist.Persister;
 	import drop.scene.SceneContainer;
 	import drop.system.AddPendingCreditsSystem;
 	import drop.system.BoundsSystem;
@@ -23,6 +24,7 @@ package drop.board
 	import drop.system.MatchingStateEndingSystem;
 	import drop.system.MatchingSystem;
 	import drop.system.MoveSystem;
+	import drop.system.PersistSystem;
 	import drop.system.ScriptSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
@@ -32,6 +34,7 @@ package drop.board
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
+	import drop.system.TurnStartStateEndingSystem;
 	import drop.util.MathUtils;
 
 	import flash.geom.Point;
@@ -56,6 +59,7 @@ package drop.board
 		private var dragStartPositionY : Number = -1;
 		private var engine : Engine;
 		private var gameNode : GameNode;
+		private var persister : Persister;
 
 		public function Board(assets : AssetManager)
 		{
@@ -98,33 +102,49 @@ package drop.board
 
 			var entityManager : EntityManager = new EntityManager(engine, assets, boardSize, tileSize);
 
-			engine.addEntity(entityManager.createGame());
-			gameNode = engine.getNodeList(GameNode).head;
+			persister = new Persister(engine, entityManager);
 
-			for (var row : int = 0; row < boardSize.y; row++)
+			if (persister.hasPersistedData())
 			{
-				for (var column : int = 0; column < boardSize.x; column++)
+				persister.restore();
+
+				updateSpawnerButtonLabels();
+			}
+			else
+			{
+				engine.addEntity(entityManager.createGame());
+
+				for (var row : int = 0; row < boardSize.y; row++)
 				{
-					var x : Number = column * tileSize;
-					var y : Number = row * tileSize;
-					if (row == 0)
+					for (var column : int = 0; column < boardSize.x; column++)
 					{
-						engine.addEntity(entityManager.createSpawner(x, y));
-					}
-					if (row == 3 && column == 3)
-					{
-						engine.addEntity(entityManager.createBlocker(x, y));
-					}
-					else
-					{
-						engine.addEntity(entityManager.createTile(x, y));
+						var x : Number = column * tileSize;
+						var y : Number = row * tileSize;
+						if (row == 0)
+						{
+							engine.addEntity(entityManager.createSpawner(x, y));
+						}
+						if (row == 3 && column == 3)
+						{
+							engine.addEntity(entityManager.createBlocker(x, y));
+						}
+						else
+						{
+							engine.addEntity(entityManager.createTile(x, y));
+						}
 					}
 				}
 			}
 
+			gameNode = engine.getNodeList(GameNode).head;
+
 			var matcher : Matcher = new Matcher(boardSize, tileSize);
 
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
+
+			var turnStartState : EngineState = stateMachine.createState("turnStart");
+			turnStartState.addInstance(new PersistSystem(persister)).withPriority(SystemPriorities.LOGIC);
+			turnStartState.addInstance(new TurnStartStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
 			var selectingState : EngineState = stateMachine.createState("selecting");
 			selectingState.addInstance(new TouchInputSystem(sceneContainer.touchQuad)).withPriority(SystemPriorities.INPUT);
@@ -161,7 +181,7 @@ package drop.board
 			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(sceneContainer.boardContainer, tileSize), SystemPriorities.DISPLAY);
 
-			stateMachine.changeState("selecting");
+			stateMachine.changeState("turnStart");
 
 			var tickProvider : ITickProvider = new StarlingFixedTickProvider(Starling.juggler, 0.017);
 			tickProvider.add(engine.update);
@@ -229,10 +249,24 @@ package drop.board
 							gameNode.gameStateComponent.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
 					{
 						gameNode.gameStateComponent.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
-						gameNode.gameStateComponent.creditsUpdated.dispatch(gameNode.gameStateComponent.credits);
+						gameNode.gameStateComponent.creditsUpdated.dispatch();
 
 						spawnerNode.spawnerComponent.spawnerLevel++;
 
+						updateSpawnerButtonLabels();
+					}
+				}
+			}
+		}
+
+		private function updateSpawnerButtonLabels() : void
+		{
+			for each (var spawnerButton : Button in sceneContainer.spawnerButtons)
+			{
+				for (var spawnerNode : SpawnerNode = engine.getNodeList(SpawnerNode).head; spawnerNode; spawnerNode = spawnerNode.next)
+				{
+					if (spawnerNode.transformComponent.x == spawnerButton.x)
+					{
 						spawnerButton.text = spawnerNode.spawnerComponent.spawnerLevel.toString();
 					}
 				}
