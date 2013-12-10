@@ -7,21 +7,25 @@ package drop.system
 
 	import starling.animation.Tween;
 	import starling.core.Starling;
+	import starling.display.Sprite;
 	import starling.text.TextField;
 
 	public class HudDisplaySystem extends System
 	{
 		private var creditsTextField : TextField;
 		private var pendingCreditsTextField : TextField;
+		private var pendingCreditsRecordSprite : Sprite;
 
 		private var gameNode : GameNode;
 
-		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField)
+		public function HudDisplaySystem(creditsTextField : TextField, pendingCreditsTextField : TextField, pendingCreditsRecordSprite : Sprite)
 		{
 			this.creditsTextField = creditsTextField;
 			this.pendingCreditsTextField = pendingCreditsTextField;
+			this.pendingCreditsRecordSprite = pendingCreditsRecordSprite;
 
 			pendingCreditsTextField.visible = false;
+			pendingCreditsRecordSprite.visible = false;
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -69,6 +73,8 @@ package drop.system
 					pendingCreditsTextField.visible = false;
 				};
 				Starling.juggler.add(tween);
+
+				pendingCreditsRecordSprite.visible = false;
 			}
 			else
 			{
@@ -82,6 +88,8 @@ package drop.system
 					pendingCreditsTextField.text = "+" + int(proxy.pendingCredits) + " ";
 				};
 				Starling.juggler.add(tween);
+
+				pendingCreditsRecordSprite.visible = gameNode.gameStateComponent.pendingCredits >= gameNode.gameStateComponent.pendingCreditsRecord;
 			}
 		}
 	}

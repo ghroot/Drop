@@ -18,6 +18,7 @@ package drop.component
 
 		public var credits : int;
 		public var pendingCredits : int;
+		public var pendingCreditsRecord : int;
 
 		public var shouldStartSwap : Boolean;
 		public var swapInProgress : Boolean;
@@ -73,6 +74,12 @@ package drop.component
 		public function withCredits(value : int) : GameStateComponent
 		{
 			credits = value;
+			return this;
+		}
+
+		public function withPendingCreditsRecord(value : int) : GameStateComponent
+		{
+			pendingCreditsRecord = value;
 			return this;
 		}
 

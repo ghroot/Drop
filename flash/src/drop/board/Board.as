@@ -24,6 +24,7 @@ package drop.board
 	import drop.system.MatchingStateEndingSystem;
 	import drop.system.MatchingSystem;
 	import drop.system.MoveSystem;
+	import drop.system.PendingCreditsRecordSystem;
 	import drop.system.PersistSystem;
 	import drop.system.ScriptSystem;
 	import drop.system.SelectControlSystem;
@@ -172,13 +173,14 @@ package drop.board
 
 			var turnEndState : EngineState = stateMachine.createState("turnEnd");
 			turnEndState.addInstance(new ComboSystem()).withPriority(SystemPriorities.PRE_LOGIC);
-			turnEndState.addInstance(new AddPendingCreditsSystem()).withPriority(SystemPriorities.LOGIC);
+			turnEndState.addInstance(new PendingCreditsRecordSystem()).withPriority(SystemPriorities.LOGIC);
+			turnEndState.addInstance(new AddPendingCreditsSystem()).withPriority(SystemPriorities.POST_LOGIC);
 			turnEndState.addInstance(new TurnEndStateEndingSystem(stateMachine, matcher, entityManager)).withPriority(SystemPriorities.END);
 
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField), SystemPriorities.DISPLAY);
+			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField, sceneContainer.pendingCreditsRecordSprite), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(sceneContainer.boardContainer, tileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("turnStart");

@@ -30,6 +30,7 @@ package drop.scene
 		public var overlayContainer : Sprite;
 		public var creditsTextField : TextField;
 		public var pendingCreditsTextField : TextField;
+		public var pendingCreditsRecordSprite : Sprite;
 		public var bottomTouchQuad : Quad;
 
 		public function SceneContainer(assets : AssetManager, boardSize : Point, tileSize : int)
@@ -104,6 +105,22 @@ package drop.scene
 			pendingCreditsTextField.y = creditsTextField.y + 26;
 			pendingCreditsTextField.touchable = false;
 			addChild(pendingCreditsTextField);
+
+			pendingCreditsRecordSprite = new Sprite();
+			pendingCreditsRecordSprite.x = stage.stageWidth / 2;
+			pendingCreditsRecordSprite.y = creditsTextField.y + 54;
+			pendingCreditsRecordSprite.touchable = false;
+			addChild(pendingCreditsRecordSprite);
+
+			var pendingCreditsRecordBackground : Quad = new Quad(72, 18, Color.BLACK);
+			DisplayUtils.centerPivotX(pendingCreditsRecordBackground);
+			pendingCreditsRecordSprite.addChild(pendingCreditsRecordBackground);
+
+			var pendingCreditsRecordTextField : TextField = new TextField(stage.stageWidth, 30, "RECORD", "fontSmall", 16, Color.WHITE);
+			pendingCreditsRecordTextField.hAlign = HAlign.CENTER;
+			pendingCreditsRecordTextField.vAlign = VAlign.TOP;
+			DisplayUtils.centerPivotX(pendingCreditsRecordTextField);
+			pendingCreditsRecordSprite.addChild(pendingCreditsRecordTextField);
 
 			bottomTouchQuad = new Quad(stage.stageWidth, stage.stageHeight - boardSize.y * tileSize - boardPosition.y);
 			bottomTouchQuad.y = boardPosition.y + boardSize.y * tileSize + boardPosition.y;

@@ -24,8 +24,6 @@ package drop.board
 	import drop.component.script.ScaleScript;
 	import drop.component.script.ScriptComponent;
 	import drop.component.script.TweenScript;
-	import drop.data.MatchPatternLevel;
-	import drop.data.MatchPatterns;
 	import drop.data.ZOrder;
 	import drop.util.DisplayUtils;
 
@@ -62,11 +60,11 @@ package drop.board
 			this.tileSize = tileSize;
 		}
 
-		public function createGame(credits : int = 0, matchPatternPoints : Object = null) : Entity
+		public function createGame(credits : int = 0, pendingCreditsRecord : int = 0, matchPatternPoints : Object = null) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(GameStateComponent.create().withCredits(credits).withMatchPatternPoints(matchPatternPoints));
+			entity.add(GameStateComponent.create().withCredits(credits).withPendingCreditsRecord(pendingCreditsRecord).withMatchPatternPoints(matchPatternPoints));
 			entity.add(TypeComponent.create().withType("game"));
 
 			return entity;
