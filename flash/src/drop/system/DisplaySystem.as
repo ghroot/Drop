@@ -84,14 +84,8 @@ package drop.system
 			}
 		}
 
-
-
-
-
 		override public function update(time : Number) : void
 		{
-			super.update(time);
-
 			for (var displayNode : DisplayNode = displayNodeList.head; displayNode; displayNode = displayNode.next)
 			{
 				updateTransform(displayNode);
