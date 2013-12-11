@@ -78,9 +78,14 @@ package drop.system
 					return 5;
 				case 3:
 					return 10;
-				default:
+				case 4:
 					return 15;
+				case 5:
+					return 20;
+				case 6:
+					return 25;
 			}
+			return 0;
 		}
 	}
 }

@@ -255,6 +255,8 @@ package drop.board
 
 						spawnerNode.spawnerComponent.spawnerLevel++;
 
+						persister.persist();
+
 						updateSpawnerButtonLabels();
 					}
 				}
@@ -295,13 +297,13 @@ package drop.board
 				{
 					return 10000;
 				}
-				case 4:
+				case 5:
 				{
 					return 20000;
 				}
 				default:
 				{
-					return 0;
+					return int.MAX_VALUE;
 				}
 			}
 		}
