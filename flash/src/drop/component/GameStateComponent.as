@@ -64,10 +64,10 @@ package drop.component
 			totalNumberOfLineBlastsDuringCascading = 0;
 
 			matchPatternLevels = new Dictionary();
-			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW, Vector.<int>([0, 0, 10, 30, 60, 100, 150]));
-			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW, Vector.<int>([0, 0, 3, 8, 15, 30, 50]));
-			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, Vector.<int>([0, 0, 3, 8, 15, 30, 50]));
-			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, Vector.<int>([0, 0, 2, 5, 10, 18, 30]));
+			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW, Vector.<int>([0, 0, 10, 30, 60, 100, 150, 300]));
+			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW, Vector.<int>([0, 0, 3, 8, 15, 30, 50, 100]));
+			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, Vector.<int>([0, 0, 3, 8, 15, 30, 50, 100]));
+			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, Vector.<int>([0, 0, 2, 5, 10, 18, 30, 60]));
 			isSelecting = false;
 		}
 

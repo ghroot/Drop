@@ -247,7 +247,7 @@ package drop.board
 			{
 				if (spawnerNode.transformComponent.x == spawnerButton.x)
 				{
-					if (spawnerNode.spawnerComponent.spawnerLevel < 4 &&
+					if (spawnerNode.spawnerComponent.spawnerLevel < 6 &&
 							gameNode.gameStateComponent.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
 					{
 						gameNode.gameStateComponent.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
@@ -290,6 +290,14 @@ package drop.board
 				case 3:
 				{
 					return 5000;
+				}
+				case 4:
+				{
+					return 10000;
+				}
+				case 4:
+				{
+					return 20000;
 				}
 				default:
 				{
