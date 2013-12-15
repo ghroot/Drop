@@ -31,6 +31,8 @@ package drop.scene
 		public var creditsTextField : TextField;
 		public var pendingCreditsTextField : TextField;
 		public var pendingCreditsRecordSprite : Sprite;
+		public var percentileImagesContainer : Sprite;
+		public var percentileImages : Vector.<Image>;
 		public var bottomTouchQuad : Quad;
 
 		public function SceneContainer(assets : AssetManager, boardSize : Point, tileSize : int)
@@ -121,6 +123,24 @@ package drop.scene
 			pendingCreditsRecordTextField.vAlign = VAlign.TOP;
 			DisplayUtils.centerPivotX(pendingCreditsRecordTextField);
 			pendingCreditsRecordSprite.addChild(pendingCreditsRecordTextField);
+
+			percentileImages = new Vector.<Image>();
+			percentileImagesContainer = new Sprite();
+			percentileImagesContainer.x = 10;
+			percentileImagesContainer.y = stage.stageHeight + 35;
+			for (var x : Number = 0; x < 300; x += 6)
+			{
+				var percentileImage : Image = new Image(assets.getTexture("percentile"));
+				percentileImage.x = x;
+				if (x == 246)
+				{
+					percentileImage.y = -5;
+				}
+				percentileImage.pivotY = percentileImage.height;
+				percentileImagesContainer.addChild(percentileImage);
+			}
+//			percentileImagesContainer.alpha = 0;
+			addChild(percentileImagesContainer);
 
 			bottomTouchQuad = new Quad(stage.stageWidth, stage.stageHeight - boardSize.y * tileSize - boardPosition.y);
 			bottomTouchQuad.y = boardPosition.y + boardSize.y * tileSize + boardPosition.y;

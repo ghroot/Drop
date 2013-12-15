@@ -13,12 +13,16 @@ package drop.component
 	{
 		public var creditsUpdated : ISignal;
 		public var pendingCreditsUpdated : ISignal;
+		public var percentileUpdated : ISignal;
 
 		public var inputs : Vector.<Input>;
 
 		public var credits : int;
 		public var pendingCredits : int;
 		public var pendingCreditsRecord : int;
+
+		public var percentile : Number;
+		public var isPercentileEnabled : Boolean;
 
 		public var shouldStartSwap : Boolean;
 		public var swapInProgress : Boolean;
@@ -37,6 +41,7 @@ package drop.component
 		{
 			creditsUpdated = new Signal();
 			pendingCreditsUpdated = new Signal();
+			percentileUpdated = new Signal();
 		}
 
 		public static function create() : GameStateComponent
@@ -52,6 +57,9 @@ package drop.component
 
 			credits = 0;
 			pendingCredits = 0;
+
+			percentile = -1;
+			isPercentileEnabled = false;
 
 			shouldStartSwap = false;
 			swapInProgress = false;

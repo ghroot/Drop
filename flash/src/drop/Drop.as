@@ -63,7 +63,7 @@ package drop
 			mStarling.stage.stageHeight = stageHeight;
 			mStarling.simulateMultitouch  = false;
 			mStarling.enableErrorChecking = false;
-			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
+//			mStarling.showStatsAt(HAlign.LEFT, VAlign.BOTTOM);
 
 			mStarling.addEventListener(starling.events.Event.ROOT_CREATED, function(event : *) : void
 			{

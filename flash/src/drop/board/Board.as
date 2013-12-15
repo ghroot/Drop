@@ -16,6 +16,7 @@ package drop.board
 	import drop.system.ComboSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
+	import drop.system.GetConfigFromServerSystem;
 	import drop.system.HighlightDisplaySystem;
 	import drop.system.HighlightSystem;
 	import drop.system.HighlightingStateEndingSystem;
@@ -32,6 +33,7 @@ package drop.board
 	import drop.system.SpawnerSystem;
 	import drop.system.SwapSystem;
 	import drop.system.SwappingStateEndingSystem;
+	import drop.system.SyncScoreWithServerSystem;
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
@@ -144,6 +146,8 @@ package drop.board
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var turnStartState : EngineState = stateMachine.createState("turnStart");
+			turnStartState.addInstance(new GetConfigFromServerSystem()).withPriority(SystemPriorities.LOGIC);
+			turnStartState.addInstance(new SyncScoreWithServerSystem()).withPriority(SystemPriorities.LOGIC);
 			turnStartState.addInstance(new PersistSystem(persister)).withPriority(SystemPriorities.LOGIC);
 			turnStartState.addInstance(new TurnStartStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
