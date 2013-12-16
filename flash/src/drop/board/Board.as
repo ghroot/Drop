@@ -1,6 +1,7 @@
 package drop.board
 {
 	import ash.core.Engine;
+	import ash.core.Entity;
 	import ash.fsm.EngineState;
 	import ash.fsm.EngineStateMachine;
 	import ash.integration.starling.StarlingFixedTickProvider;
@@ -37,20 +38,28 @@ package drop.board
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
 	import drop.system.TurnStartStateEndingSystem;
+	import drop.util.DisplayUtils;
 	import drop.util.EndlessValueSequence;
 	import drop.util.MathUtils;
 
 	import flash.geom.Point;
 
+	import starling.animation.Tween;
+
 	import starling.core.Starling;
 	import starling.display.Button;
 	import starling.display.DisplayObject;
+	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+	import starling.text.TextField;
 	import starling.utils.AssetManager;
+	import starling.utils.Color;
+	import starling.utils.HAlign;
+	import starling.utils.VAlign;
 
 	public class Board extends Sprite
 	{
@@ -64,6 +73,8 @@ package drop.board
 		private var gameNode : GameNode;
 		private var spawnerLevelCost : EndlessValueSequence;
 		private var persister : Persister;
+		private var selectedSpawnerEntity : Entity;
+		private var spawnerUpgradeConfirmationSprite : Sprite;
 
 		public function Board(assets : AssetManager)
 		{
@@ -224,7 +235,7 @@ package drop.board
 						}
 						else
 						{
-							sceneContainer.boardContainer.y = position.y - dragStartPositionY;
+							sceneContainer.boardContainer.y = sceneContainer.boardPosition.y + position.y - dragStartPositionY;
 							sceneContainer.boardContainer.y = MathUtils.max(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y);
 							sceneContainer.boardContainer.y = MathUtils.min(sceneContainer.boardContainer.y, sceneContainer.boardPosition.y + tileSize);
 						}
@@ -243,10 +254,22 @@ package drop.board
 						dragStartPositionY = -1;
 					}
 
-					sceneContainer.touchQuad.touchable = sceneContainer.boardContainer.y == sceneContainer.boardPosition.y;
-					sceneContainer.boardContainer.alpha = MathUtils.min(1, (1 - Math.abs(sceneContainer.boardPosition.y - sceneContainer.boardContainer.y) / tileSize) + 0.1);
-					sceneContainer.spawnerButtonsContainer.alpha = 1 - sceneContainer.boardContainer.alpha;
-					sceneContainer.spawnerButtonsContainer.y = sceneContainer.boardContainer.y - tileSize;
+					if (touch.phase == TouchPhase.MOVED ||
+							touch.phase == TouchPhase.ENDED)
+					{
+						sceneContainer.touchQuad.touchable = sceneContainer.boardContainer.y == sceneContainer.boardPosition.y;
+						sceneContainer.boardContainer.alpha = MathUtils.min(1, (1 - Math.abs(sceneContainer.boardPosition.y - sceneContainer.boardContainer.y) / tileSize) + 0.1);
+						sceneContainer.spawnerButtonsContainer.alpha = 1 - sceneContainer.boardContainer.alpha;
+						sceneContainer.spawnerButtonsContainer.y = sceneContainer.boardContainer.y - tileSize;
+
+						if (spawnerUpgradeConfirmationSprite != null)
+						{
+							removeChild(spawnerUpgradeConfirmationSprite);
+							spawnerUpgradeConfirmationSprite = null;
+						}
+
+						selectedSpawnerEntity = null;
+					}
 				}
 			}
 		}
@@ -259,16 +282,69 @@ package drop.board
 				if (spawnerNode.transformComponent.x == spawnerButton.x)
 				{
 					var cost : int = spawnerLevelCost.getValue(spawnerNode.spawnerComponent.spawnerLevel);
-					if (gameNode.gameStateComponent.credits >= cost)
+
+					if (spawnerUpgradeConfirmationSprite != null)
 					{
-						gameNode.gameStateComponent.credits -= cost;
-						gameNode.gameStateComponent.creditsUpdated.dispatch();
+						removeChild(spawnerUpgradeConfirmationSprite);
+						spawnerUpgradeConfirmationSprite = null;
+					}
 
-						spawnerNode.spawnerComponent.spawnerLevel++;
+					if (selectedSpawnerEntity == null ||
+							spawnerNode.entity != selectedSpawnerEntity)
+					{
+						selectedSpawnerEntity = spawnerNode.entity;
 
-						persister.persist();
+						if (gameNode.gameStateComponent.credits >= cost)
+						{
+							spawnerUpgradeConfirmationSprite = new Sprite();
+							spawnerUpgradeConfirmationSprite.x = spawnerButton.x + spawnerButton.width / 2;
+							spawnerUpgradeConfirmationSprite.x = Math.max(spawnerUpgradeConfirmationSprite.x, 90);
+							spawnerUpgradeConfirmationSprite.x = Math.min(spawnerUpgradeConfirmationSprite.x, stage.stageWidth - 90);
+							spawnerUpgradeConfirmationSprite.y = spawnerButton.y + spawnerButton.height + 20;
+							var textField : TextField = new TextField(170, 200, "Tap again to upgrade for " + cost, "fontSmall", 20, Color.BLACK);
+							textField.hAlign = HAlign.CENTER;
+							textField.vAlign = VAlign.TOP;
+							spawnerUpgradeConfirmationSprite.addChild(textField);
+							DisplayUtils.centerPivotX(spawnerUpgradeConfirmationSprite);
+							addChild(spawnerUpgradeConfirmationSprite);
+						}
+						else
+						{
+							spawnerUpgradeConfirmationSprite = new Sprite();
+							spawnerUpgradeConfirmationSprite.x = spawnerButton.x + spawnerButton.width / 2;
+							spawnerUpgradeConfirmationSprite.x = Math.max(spawnerUpgradeConfirmationSprite.x, 75);
+							spawnerUpgradeConfirmationSprite.x = Math.min(spawnerUpgradeConfirmationSprite.x, stage.stageWidth - 75);
+							spawnerUpgradeConfirmationSprite.y = spawnerButton.y + spawnerButton.height + 20;
+							textField = new TextField(140, 200, "Need " + cost + " to upgrade", "fontSmall", 20, Color.BLACK);
+							textField.hAlign = HAlign.CENTER;
+							textField.vAlign = VAlign.TOP;
+							spawnerUpgradeConfirmationSprite.addChild(textField);
+							DisplayUtils.centerPivotX(spawnerUpgradeConfirmationSprite);
+							addChild(spawnerUpgradeConfirmationSprite);
+						}
 
-						updateSpawnerButtonLabels();
+						var tween : Tween = new Tween(spawnerUpgradeConfirmationSprite, 0.25);
+						tween.animate("y", spawnerUpgradeConfirmationSprite.y);
+						tween.animate("alpha", 1);
+						Starling.juggler.add(tween);
+						spawnerUpgradeConfirmationSprite.y += 10;
+						spawnerUpgradeConfirmationSprite.alpha = 0;
+					}
+					else
+					{
+						if (gameNode.gameStateComponent.credits >= cost)
+						{
+							gameNode.gameStateComponent.credits -= cost;
+							gameNode.gameStateComponent.creditsUpdated.dispatch();
+
+							spawnerNode.spawnerComponent.spawnerLevel++;
+
+							persister.persist();
+
+							updateSpawnerButtonLabels();
+						}
+
+						selectedSpawnerEntity = null;
 					}
 				}
 			}
