@@ -1,43 +1,38 @@
 package drop.data
 {
+	import drop.util.EndlessValueSequence;
+
 	public class MatchPatternLevel
 	{
 		public var pattern : int;
-		private var requiredPointsPerLevel : Vector.<int>;
+		private var requiredPoints : EndlessValueSequence;
 
 		public var points : int;
 
-		public function MatchPatternLevel(pattern : int, requiredPointsPerLevel : Vector.<int>)
+		public function MatchPatternLevel(pattern : int, requiredPoints : EndlessValueSequence)
 		{
 			this.pattern = pattern;
-			this.requiredPointsPerLevel = requiredPointsPerLevel;
+			this.requiredPoints = requiredPoints;
 		}
 
 		public function getLevel() : int
 		{
-			for (var i : int = requiredPointsPerLevel.length - 1; i >= 0; i--)
+			var level : int = 0;
+			while (requiredPoints.getValue(level) < points)
 			{
-				if (points >= requiredPointsPerLevel[i])
-				{
-					return i;
-				}
+				level++;
 			}
-			return 0;
+			return level;
 		}
 
 		public function getNumberOfBonusCredits() : int
 		{
-			return (getLevel() - 1) * 3;
+			return getLevel() * 3;
 		}
 
 		public function getRequiredPointsForNextLevel() : int
 		{
-			return requiredPointsPerLevel[getLevel() + 1];
-		}
-
-		public function getPercentTowardsNextLevel() : Number
-		{
-			return (points - requiredPointsPerLevel[getLevel()]) / (getRequiredPointsForNextLevel() - requiredPointsPerLevel[getLevel()]);
+			return requiredPoints.getValue(getLevel() + 1);
 		}
 	}
 }

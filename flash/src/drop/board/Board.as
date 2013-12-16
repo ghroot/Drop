@@ -16,7 +16,6 @@ package drop.board
 	import drop.system.ComboSystem;
 	import drop.system.CountdownSystem;
 	import drop.system.DisplaySystem;
-	import drop.system.GetConfigFromServerSystem;
 	import drop.system.HighlightDisplaySystem;
 	import drop.system.HighlightSystem;
 	import drop.system.HighlightingStateEndingSystem;
@@ -27,17 +26,18 @@ package drop.board
 	import drop.system.MoveSystem;
 	import drop.system.PendingCreditsRecordSystem;
 	import drop.system.PersistSystem;
+	import drop.system.ScoreSynchronizationSystem;
 	import drop.system.ScriptSystem;
 	import drop.system.SelectControlSystem;
 	import drop.system.SelectingStateEndingSystem;
 	import drop.system.SpawnerSystem;
 	import drop.system.SwapSystem;
 	import drop.system.SwappingStateEndingSystem;
-	import drop.system.SyncScoreWithServerSystem;
 	import drop.system.SystemPriorities;
 	import drop.system.TouchInputSystem;
 	import drop.system.TurnEndStateEndingSystem;
 	import drop.system.TurnStartStateEndingSystem;
+	import drop.util.EndlessValueSequence;
 	import drop.util.MathUtils;
 
 	import flash.geom.Point;
@@ -62,11 +62,17 @@ package drop.board
 		private var dragStartPositionY : Number = -1;
 		private var engine : Engine;
 		private var gameNode : GameNode;
+		private var spawnerLevelCost : EndlessValueSequence;
 		private var persister : Persister;
 
 		public function Board(assets : AssetManager)
 		{
 			this.assets = assets;
+
+			spawnerLevelCost = new EndlessValueSequence(100, function(previousValue : int, currentValue : int) : int
+			{
+				return currentValue * 2;
+			});
 
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
@@ -78,6 +84,8 @@ package drop.board
 			setupSize();
 			setupScene();
 			createWorld();
+
+			updateSpawnerButtonLabels();
 		}
 
 		private function setupSize() : void
@@ -146,8 +154,6 @@ package drop.board
 			var stateMachine : EngineStateMachine = new EngineStateMachine(engine);
 
 			var turnStartState : EngineState = stateMachine.createState("turnStart");
-			turnStartState.addInstance(new GetConfigFromServerSystem()).withPriority(SystemPriorities.LOGIC);
-			turnStartState.addInstance(new SyncScoreWithServerSystem()).withPriority(SystemPriorities.LOGIC);
 			turnStartState.addInstance(new PersistSystem(persister)).withPriority(SystemPriorities.LOGIC);
 			turnStartState.addInstance(new TurnStartStateEndingSystem(stateMachine)).withPriority(SystemPriorities.END);
 
@@ -184,7 +190,8 @@ package drop.board
 			engine.addSystem(new BoundsSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new CountdownSystem(entityManager), SystemPriorities.LOGIC);
 			engine.addSystem(new ScriptSystem(), SystemPriorities.LOGIC);
-			engine.addSystem(new HudDisplaySystem(sceneContainer.creditsTextField, sceneContainer.pendingCreditsTextField, sceneContainer.pendingCreditsRecordSprite), SystemPriorities.DISPLAY);
+			engine.addSystem(new ScoreSynchronizationSystem(spawnerLevelCost), SystemPriorities.LOGIC);
+			engine.addSystem(new HudDisplaySystem(sceneContainer), SystemPriorities.DISPLAY);
 			engine.addSystem(new DisplaySystem(sceneContainer.boardContainer, tileSize), SystemPriorities.DISPLAY);
 
 			stateMachine.changeState("turnStart");
@@ -251,10 +258,10 @@ package drop.board
 			{
 				if (spawnerNode.transformComponent.x == spawnerButton.x)
 				{
-					if (spawnerNode.spawnerComponent.spawnerLevel < 6 &&
-							gameNode.gameStateComponent.credits >= getCostForSpawnerLevelUpgrade(spawnerNode))
+					var cost : int = spawnerLevelCost.getValue(spawnerNode.spawnerComponent.spawnerLevel);
+					if (gameNode.gameStateComponent.credits >= cost)
 					{
-						gameNode.gameStateComponent.credits -= getCostForSpawnerLevelUpgrade(spawnerNode);
+						gameNode.gameStateComponent.credits -= cost;
 						gameNode.gameStateComponent.creditsUpdated.dispatch();
 
 						spawnerNode.spawnerComponent.spawnerLevel++;
@@ -275,39 +282,8 @@ package drop.board
 				{
 					if (spawnerNode.transformComponent.x == spawnerButton.x)
 					{
-						spawnerButton.text = spawnerNode.spawnerComponent.spawnerLevel.toString();
+						spawnerButton.text = (spawnerNode.spawnerComponent.spawnerLevel + 1).toString();
 					}
-				}
-			}
-		}
-
-		private function getCostForSpawnerLevelUpgrade(spawnerNode : SpawnerNode) : int
-		{
-			switch (spawnerNode.spawnerComponent.spawnerLevel)
-			{
-				case 1:
-				{
-					return 100;
-				}
-				case 2:
-				{
-					return 1000;
-				}
-				case 3:
-				{
-					return 5000;
-				}
-				case 4:
-				{
-					return 10000;
-				}
-				case 5:
-				{
-					return 20000;
-				}
-				default:
-				{
-					return int.MAX_VALUE;
 				}
 			}
 		}

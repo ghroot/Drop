@@ -60,11 +60,11 @@ package drop.board
 			this.tileSize = tileSize;
 		}
 
-		public function createGame(credits : int = 0, pendingCreditsRecord : int = 0, matchPatternPoints : Object = null) : Entity
+		public function createGame(uniqueId : uint = 0, credits : int = 0, pendingCreditsRecord : int = 0, matchPatternPoints : Object = null) : Entity
 		{
 			var entity : Entity = new Entity();
 
-			entity.add(GameStateComponent.create().withCredits(credits).withPendingCreditsRecord(pendingCreditsRecord).withMatchPatternPoints(matchPatternPoints));
+			entity.add(GameStateComponent.create().withUniqueId(uniqueId).withCredits(credits).withPendingCreditsRecord(pendingCreditsRecord).withMatchPatternPoints(matchPatternPoints));
 			entity.add(TypeComponent.create().withType("game"));
 
 			return entity;
@@ -269,7 +269,7 @@ package drop.board
 			return entity;
 		}
 
-		public function createSpawner(x : Number, y : Number, spawnerLevel : int = 1) : Entity
+		public function createSpawner(x : Number, y : Number, spawnerLevel : int = 0) : Entity
 		{
 			var entity : Entity = new Entity();
 

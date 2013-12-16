@@ -51,7 +51,7 @@ package drop.persist
 					{
 						matchPatternPointsObject[pattern] = gameStateComponent.matchPatternLevels[pattern].points;
 					}
-					object["GameStateComponent"] = { "credits": gameStateComponent.credits, "pendingCreditsRecord": gameStateComponent.pendingCreditsRecord, "matchPatternPoints": matchPatternPointsObject };
+					object["GameStateComponent"] = { "uniqueId": gameStateComponent.uniqueId, "credits": gameStateComponent.credits, "pendingCreditsRecord": gameStateComponent.pendingCreditsRecord, "matchPatternPoints": matchPatternPointsObject };
 				}
 
 				var spawnerComponent : SpawnerComponent = typeNode.entity.get(SpawnerComponent);
@@ -89,7 +89,7 @@ package drop.persist
 				switch (object["TypeComponent"]["type"])
 				{
 					case "game":
-						engine.addEntity(entityManager.createGame(object["GameStateComponent"]["credits"], object["GameStateComponent"]["pendingCreditsRecord"], object["GameStateComponent"]["matchPatternPoints"]));
+						engine.addEntity(entityManager.createGame(object["GameStateComponent"]["uniqueId"], object["GameStateComponent"]["credits"], object["GameStateComponent"]["pendingCreditsRecord"], object["GameStateComponent"]["matchPatternPoints"]));
 						break;
 					case "tile":
 						engine.addEntity(entityManager.createTile(object["TransformComponent"]["x"], object["TransformComponent"]["y"], object["MatchComponent"]["type"]));

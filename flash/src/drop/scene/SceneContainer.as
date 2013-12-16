@@ -11,6 +11,7 @@ package drop.scene
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.text.TextField;
+	import starling.textures.Texture;
 	import starling.utils.AssetManager;
 	import starling.utils.Color;
 	import starling.utils.HAlign;
@@ -75,7 +76,7 @@ package drop.scene
 			spawnerButtonsContainer.y = boardPosition.y - tileSize;
 			for (var column : int = 0; column < boardSize.x; column++)
 			{
-				var spawnerButton : Button = new Button(assets.getTexture("spawner"), "1");
+				var spawnerButton : Button = new Button(assets.getTexture("spawner"), "");
 				spawnerButton.fontName = "fontSmall";
 				spawnerButton.fontSize = 20;
 				spawnerButton.fontColor = Color.WHITE;
@@ -127,19 +128,17 @@ package drop.scene
 			percentileImages = new Vector.<Image>();
 			percentileImagesContainer = new Sprite();
 			percentileImagesContainer.x = 10;
-			percentileImagesContainer.y = stage.stageHeight + 35;
-			for (var x : Number = 0; x < 300; x += 6)
+			percentileImagesContainer.y = stage.stageHeight + 40;
+			var percentileTexture : Texture = assets.getTexture("percentile");
+			for (var i : int = 0; i < 50; i++)
 			{
-				var percentileImage : Image = new Image(assets.getTexture("percentile"));
-				percentileImage.x = x;
-				if (x == 246)
-				{
-					percentileImage.y = -5;
-				}
+				var percentileImage : Image = new Image(percentileTexture);
+				percentileImage.x = i * (percentileTexture.width + 1);
 				percentileImage.pivotY = percentileImage.height;
 				percentileImagesContainer.addChild(percentileImage);
+				percentileImages[percentileImages.length] = percentileImage;
 			}
-//			percentileImagesContainer.alpha = 0;
+			percentileImagesContainer.visible = false;
 			addChild(percentileImagesContainer);
 
 			bottomTouchQuad = new Quad(stage.stageWidth, stage.stageHeight - boardSize.y * tileSize - boardPosition.y);

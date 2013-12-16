@@ -3,6 +3,7 @@ package drop.component
 	import ash.tools.ComponentPool;
 
 	import drop.data.*;
+	import drop.util.EndlessValueSequence;
 
 	import flash.utils.Dictionary;
 
@@ -16,6 +17,8 @@ package drop.component
 		public var percentileUpdated : ISignal;
 
 		public var inputs : Vector.<Input>;
+
+		public var uniqueId : uint;
 
 		public var credits : int;
 		public var pendingCredits : int;
@@ -55,6 +58,8 @@ package drop.component
 		{
 			inputs = new Vector.<Input>();
 
+			uniqueId = 0;
+
 			credits = 0;
 			pendingCredits = 0;
 
@@ -72,11 +77,34 @@ package drop.component
 			totalNumberOfLineBlastsDuringCascading = 0;
 
 			matchPatternLevels = new Dictionary();
-			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW, Vector.<int>([0, 0, 10, 30, 60, 100, 150, 300]));
-			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW, Vector.<int>([0, 0, 3, 8, 15, 30, 50, 100]));
-			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, Vector.<int>([0, 0, 3, 8, 15, 30, 50, 100]));
-			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, Vector.<int>([0, 0, 2, 5, 10, 18, 30, 60]));
+			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW, new EndlessValueSequence(6,
+				function(previousValue : int, currentValue : int) : int
+				{
+					return currentValue + (currentValue - previousValue) + 2;
+				}));
+			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW, new EndlessValueSequence(3,
+				function(previousValue : int, currentValue : int) : int
+				{
+					return currentValue + (currentValue - previousValue) + 1;
+				}));
+			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, new EndlessValueSequence(3,
+				function(previousValue : int, currentValue : int) : int
+				{
+					return currentValue + (currentValue - previousValue) + 1;
+				}));
+			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, new EndlessValueSequence(2,
+				function(previousValue : int, currentValue : int) : int
+				{
+					return currentValue + (currentValue - previousValue) + 1;
+				}));
+
 			isSelecting = false;
+		}
+
+		public function withUniqueId(value : uint) : GameStateComponent
+		{
+			uniqueId = value;
+			return this;
 		}
 
 		public function withCredits(value : int) : GameStateComponent
