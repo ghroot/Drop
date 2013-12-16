@@ -6,11 +6,14 @@ package drop.system
 	import drop.component.MoveComponent;
 	import drop.node.BlockNode;
 	import drop.node.SpawnerNode;
+	import drop.util.EndlessValueSequence;
 
 	public class SpawnerSystem extends System
 	{
 		private var tileSize : int;
 		private var entityManager : EntityManager;
+
+		private var lineBlastSpawnChance : EndlessValueSequence;
 
 		private var engine : Engine;
 		private var spawnerNodeList : NodeList;
@@ -20,6 +23,19 @@ package drop.system
 		{
 			this.tileSize = tileSize;
 			this.entityManager = entityManager;
+
+			lineBlastSpawnChance = new EndlessValueSequence(0,
+				function(previousValue : int, currentValue : int) : int
+				{
+					if (currentValue < 50)
+					{
+						return Math.min(currentValue + 5, 50);
+					}
+					else
+					{
+						return Math.min(currentValue + 1, 100);
+					}
+				});
 		}
 
 		override public function addToEngine(engine : Engine) : void
@@ -36,7 +52,7 @@ package drop.system
 				if (canEntityBeCreatedAt(spawnerNode))
 				{
 					var entity : Entity;
-					var chanceToCreateLineBlast : int = getChanceToCreateLineBlast(spawnerNode);
+					var chanceToCreateLineBlast : int = lineBlastSpawnChance.getValue(spawnerNode.spawnerComponent.spawnerLevel);
 					if (Math.random() * 101 <= chanceToCreateLineBlast)
 					{
 						entity = entityManager.createLineBlast(spawnerNode.transformComponent.x, spawnerNode.transformComponent.y - tileSize);
@@ -66,26 +82,6 @@ package drop.system
 				}
 			}
 			return true;
-		}
-
-		private function getChanceToCreateLineBlast(spawnerNode : SpawnerNode) : int
-		{
-			switch (spawnerNode.spawnerComponent.spawnerLevel)
-			{
-				case 1:
-					return 0;
-				case 2:
-					return 5;
-				case 3:
-					return 10;
-				case 4:
-					return 15;
-				case 5:
-					return 20;
-				case 6:
-					return 25;
-			}
-			return 0;
 		}
 	}
 }
