@@ -29,7 +29,7 @@ package drop.system
 				{
 					if (currentValue < 50)
 					{
-						return Math.min(currentValue + 5, 50);
+						return currentValue + 2;
 					}
 					else
 					{
