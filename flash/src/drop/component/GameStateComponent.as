@@ -77,29 +77,79 @@ package drop.component
 			totalNumberOfLineBlastsDuringCascading = 0;
 
 			matchPatternLevels = new Dictionary();
-			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW, new EndlessValueSequence(6,
-				function(previousValue : int, currentValue : int) : int
-				{
-					return currentValue + (currentValue - previousValue) + 2;
-				}));
-			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW, new EndlessValueSequence(3,
-				function(previousValue : int, currentValue : int) : int
-				{
-					return currentValue + (currentValue - previousValue) + 1;
-				}));
-			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L, new EndlessValueSequence(3,
-				function(previousValue : int, currentValue : int) : int
-				{
-					return currentValue + (currentValue - previousValue) + 1;
-				}));
-			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW, new EndlessValueSequence(2,
-				function(previousValue : int, currentValue : int) : int
-				{
-					return currentValue + (currentValue - previousValue) + 1;
-				}));
+			matchPatternLevels[MatchPatterns.THREE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.THREE_IN_A_ROW,
+				new EndlessValueSequence(6,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + (currentValue - previousValue) + 2;
+					}),
+				new EndlessValueSequence(3,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + 1;
+					}));
+			matchPatternLevels[MatchPatterns.FOUR_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FOUR_IN_A_ROW,
+				new EndlessValueSequence(3,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + (currentValue - previousValue) + 1;
+					}),
+				new EndlessValueSequence(4,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + 3;
+					}));
+			matchPatternLevels[MatchPatterns.T_OR_L] = new MatchPatternLevel(MatchPatterns.T_OR_L,
+				new EndlessValueSequence(3,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + (currentValue - previousValue) + 1;
+					}),
+				new EndlessValueSequence(4,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + 3;
+					}));
+			matchPatternLevels[MatchPatterns.FIVE_OR_MORE_IN_A_ROW] = new MatchPatternLevel(MatchPatterns.FIVE_OR_MORE_IN_A_ROW,
+				new EndlessValueSequence(2,
+					function(previousValue : int, currentValue : int) : int
+					{
+						if (currentValue % 3 == 0)
+						{
+							return currentValue + (currentValue - previousValue) + 1;
+						}
+						else
+						{
+							return currentValue + (currentValue - previousValue);
+						}
+					}),
+				new EndlessValueSequence(5,
+					function(previousValue : int, currentValue : int) : int
+					{
+						return currentValue + 5;
+					}));
+
+//			for (var i : int = 0; i < 30; i++)
+//			{
+//				var s : String = "[" + i + "] ";
+//				for each (var pattern : int in [MatchPatterns.THREE_IN_A_ROW, MatchPatterns.FOUR_IN_A_ROW, MatchPatterns.T_OR_L, MatchPatterns.FIVE_OR_MORE_IN_A_ROW])
+//				{
+//					s += toFixedLength("" + matchPatternLevels[pattern].requiredPoints.getValue(i), 6) + toFixedLength("(" + matchPatternLevels[pattern].creditYields.getValue(i) + ")", 6);
+//				}
+//				trace(s);
+//			}
 
 			isSelecting = false;
 		}
+
+//		private function toFixedLength(string : String, length : int) : String
+//		{
+//			while (string.length < length)
+//			{
+//				string += " ";
+//			}
+//			return string;
+//		}
 
 		public function withUniqueId(value : uint) : GameStateComponent
 		{

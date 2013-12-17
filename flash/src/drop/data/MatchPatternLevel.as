@@ -6,13 +6,15 @@ package drop.data
 	{
 		public var pattern : int;
 		private var requiredPoints : EndlessValueSequence;
+		private var creditYields : EndlessValueSequence;
 
 		public var points : int;
 
-		public function MatchPatternLevel(pattern : int, requiredPoints : EndlessValueSequence)
+		public function MatchPatternLevel(pattern : int, requiredPoints : EndlessValueSequence, creditYields : EndlessValueSequence)
 		{
 			this.pattern = pattern;
 			this.requiredPoints = requiredPoints;
+			this.creditYields = creditYields;
 		}
 
 		public function getLevel() : int
@@ -25,14 +27,9 @@ package drop.data
 			return level;
 		}
 
-		public function getNumberOfBonusCredits() : int
+		public function getCreditYield() : int
 		{
-			return getLevel() * 3;
-		}
-
-		public function getRequiredPointsForNextLevel() : int
-		{
-			return requiredPoints.getValue(getLevel() + 1);
+			return creditYields.getValue(getLevel());
 		}
 	}
 }

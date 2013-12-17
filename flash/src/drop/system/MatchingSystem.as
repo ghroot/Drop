@@ -48,16 +48,7 @@ package drop.system
 				var pattern : int = MatchPatterns.getFromMatch(match);
 				var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[pattern];
 
-				var creditsToAdd : int = match.matchNodes.length;
-				if (match.matchNodes.length >= 5)
-				{
-					creditsToAdd *= 3;
-				}
-				else if (match.matchNodes.length >= 4)
-				{
-					creditsToAdd *= 2;
-				}
-				creditsToAdd += matchPatternLevel.getNumberOfBonusCredits();
+				var creditsToAdd : int = matchPatternLevel.getCreditYield();
 				gameNode.gameStateComponent.pendingCredits += creditsToAdd;
 				gameNode.gameStateComponent.pendingCreditsUpdated.dispatch();
 

@@ -44,7 +44,7 @@ package drop.system
 			gameNode = engine.getNodeList(GameNode).head;
 
 			var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[gameNode.gameStateComponent.matchInfoToHighlight.pattern];
-			textField.text = "This shape now gives " + (gameNode.gameStateComponent.matchInfoToHighlight.positions.length + matchPatternLevel.getNumberOfBonusCredits()) + " points.";
+			textField.text = "This shape now gives " + matchPatternLevel.getCreditYield() + " points.";
 
 			var bounds : Rectangle = getMatchBounds(gameNode.gameStateComponent.matchInfoToHighlight);
 			var spaceUp : Number = bounds.y;
