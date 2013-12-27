@@ -45,11 +45,9 @@ package drop.board
 	import flash.geom.Point;
 
 	import starling.animation.Tween;
-
 	import starling.core.Starling;
 	import starling.display.Button;
 	import starling.display.DisplayObject;
-	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.Touch;

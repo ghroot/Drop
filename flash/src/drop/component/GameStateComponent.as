@@ -33,7 +33,7 @@ package drop.component
 		public var isSwappingBack : Boolean;
 
 		public var matchInfos : Vector.<MatchInfo>;
-		public var matchInfoToHighlight : MatchInfo;
+		public var matchInfosToHighlight : Vector.<MatchInfo>;
 		public var totalNumberOfMatchesDuringCascading : int;
 		public var totalNumberOfLineBlastsDuringCascading : int;
 
@@ -72,7 +72,7 @@ package drop.component
 			isSwappingBack = false;
 
 			matchInfos = new Vector.<MatchInfo>();
-			matchInfoToHighlight = null;
+			matchInfosToHighlight = new Vector.<MatchInfo>();
 			totalNumberOfMatchesDuringCascading = 0;
 			totalNumberOfLineBlastsDuringCascading = 0;
 

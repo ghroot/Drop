@@ -34,7 +34,7 @@ package drop.system
 				SelectNodeUtils.deselectSelectNodes(selectNodeList);
 				gameNode.gameStateComponent.isTryingSwap = false;
 
-				if (gameNode.gameStateComponent.matchInfoToHighlight != null)
+				if (gameNode.gameStateComponent.matchInfosToHighlight.length > 0)
 				{
 					stateMachine.changeState("highlighting");
 				}

@@ -43,10 +43,10 @@ package drop.system
 		{
 			gameNode = engine.getNodeList(GameNode).head;
 
-			var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[gameNode.gameStateComponent.matchInfoToHighlight.pattern];
+			var matchPatternLevel : MatchPatternLevel = gameNode.gameStateComponent.matchPatternLevels[gameNode.gameStateComponent.matchInfosToHighlight[0].pattern];
 			textField.text = "This shape now gives " + matchPatternLevel.getCreditYield() + " points.";
 
-			var bounds : Rectangle = getMatchBounds(gameNode.gameStateComponent.matchInfoToHighlight);
+			var bounds : Rectangle = getMatchBounds(gameNode.gameStateComponent.matchInfosToHighlight[0]);
 			var spaceUp : Number = bounds.y;
 			var spaceDown : Number = boardSize.y * tileSize - (bounds.y + bounds.height);
 			var spaceLeft : Number = bounds.x;

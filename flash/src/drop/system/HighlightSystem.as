@@ -37,7 +37,7 @@ package drop.system
 
 		private function shouldHighlightMatchNode(matchNode : MatchNode) : Boolean
 		{
-			for each (var position : Point in gameNode.gameStateComponent.matchInfoToHighlight.positions)
+			for each (var position : Point in gameNode.gameStateComponent.matchInfosToHighlight[0].positions)
 			{
 				if (matchNode.transformComponent.x == position.x &&
 						matchNode.transformComponent.y == position.y)

@@ -35,7 +35,6 @@ package drop.system
 		override public function update(time : Number) : void
 		{
 			gameNode.gameStateComponent.matchInfos.length = 0;
-			gameNode.gameStateComponent.matchInfoToHighlight = null;
 
 			var matches : Vector.<Match> = matcher.getMatches(matchNodeList);
 			for each (var match : Match in matches)
@@ -58,8 +57,7 @@ package drop.system
 				matchPatternLevel.points++;
 				if (matchPatternLevel.getLevel() > level)
 				{
-					// TODO: Handle several match infos to highlight
-					gameNode.gameStateComponent.matchInfoToHighlight = matchInfo;
+					gameNode.gameStateComponent.matchInfosToHighlight[gameNode.gameStateComponent.matchInfosToHighlight.length] = matchInfo;
 				}
 
 				gameNode.gameStateComponent.matchInfos[gameNode.gameStateComponent.matchInfos.length] = matchInfo;
