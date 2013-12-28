@@ -239,7 +239,7 @@ package drop.board
 			DisplayUtils.centerPivotY(horizontalQuad);
 
 			var fadedVerticalQuad : Quad = new Quad(14, boardSize.y * tileSize, color);
-			fadedVerticalQuad.alpha = 0.3;
+			fadedVerticalQuad.alpha = 0.2;
 			fadedVerticalQuad.pivotY = y + tileSize / 2;
 			DisplayUtils.centerPivotX(fadedVerticalQuad);
 
