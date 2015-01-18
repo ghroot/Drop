@@ -21,10 +21,10 @@ package drop
 	[SWF(frameRate="60", backgroundColor="0xffffff")]
 	public class Drop extends Sprite
 	{
-		[Embed(source="../../res/startup.png")]
+		[Embed(source="../../res/shared/startup.png")]
 		private static var Background : Class;
 
-		[Embed(source="../../res/startupHD.png")]
+		[Embed(source="../../res/shared/startupHD.png")]
 		private static var BackgroundHD : Class;
 
 		private var mStarling : Starling;
